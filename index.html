@@ -193,7 +193,7 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-        // AI Command Processor (Menyimpan dengan kolom 'tipe' sesuai Supabase Anda)
+        // AI Command Processor dengan Auto-Kategori Cerdas & Otomatis
         async function processAICommand(text) {
             const lower = text.toLowerCase();
             
@@ -203,13 +203,13 @@
 
             const numberMatch = text.match(/(\d[\d\.,]*)/);
             if (!numberMatch) {
-                return "Maaf Mind Master, format perintah belum dikenali. Gunakan contoh: <b>'Pemasukan 400000'</b> atau <b>'Pengeluaran 35rb'</b>.";
+                return "Maaf Mind Master, format perintah belum dikenali. Cukup ketik seperti: <b>'beli bawang merah 6000'</b> atau <b>'pemasukan gaji 5000000'</b>.";
             }
 
             let rawNum = numberMatch[0].replace(/\./g, '').replace(/,/g, '');
             let amount = parseFloat(rawNum);
 
-            // Deteksi jenis transaksi (Pemasukan / Pengeluaran)
+            // 1. Deteksi Tipe Otomatis (Pemasukan / Pengeluaran)
             let type = 'Pengeluaran';
             if (
                 lower.includes('masuk') || 
@@ -217,23 +217,39 @@
                 lower.includes('terima') || 
                 lower.includes('jual') || 
                 lower.includes('omset') ||
-                lower.includes('saldo awal') ||
-                lower.includes('uang sebelumnya')
+                lower.includes('gaji') ||
+                lower.includes('saldo awal')
             ) {
                 type = 'Pemasukan';
             }
 
-            let description = text.replace(numberMatch[0], '').replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp/gi, '').trim();
-            if (!description) description = type === 'Pemasukan' ? 'Pemasukan Tunai' : 'Pengeluaran Tunai';
+            // 2. Deteksi Kategori Otomatis berdasarkan kata kunci
+            let category = 'Umum';
+            if (lower.includes('makan') || lower.includes('beli') || lower.includes('bawang') || lower.includes('sayur') || lower.includes('beras') || lower.includes('dapur') || lower.includes('minum')) {
+                category = 'Konsumsi & Dapur';
+            } else if (lower.includes('bensin') || lower.includes('transport') || lower.includes('parkir') || lower.includes('gojek') || lower.includes('grab')) {
+                category = 'Transportasi';
+            } else if (lower.includes('spp') || lower.includes('sekolah') || lower.includes('buku') || lower.includes('kursus')) {
+                category = 'Pendidikan Anak';
+            } else if (lower.includes('listrik') || lower.includes('air') || lower.includes('wifi') || lower.includes('pulsa') || lower.includes('token')) {
+                category = 'Utilitas & Tagihan';
+            } else if (type === 'Pemasukan') {
+                category = 'Inflow / Pendapatan';
+            }
 
-            // Menyimpan ke tabel 'transaksi' dengan kolom 'tipe' (Huruf kapital)
+            // 3. Keterangan lengkap dari sisa teks chat
+            let description = text.replace(numberMatch[0], '').replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp/gi, '').trim();
+            if (!description) description = text; // Jika kosong, ambil seluruh kalimat user
+
+            // Menyimpan ke Supabase lengkap dengan mengisi kolom 'kategori'
             const { data, error } = await supabaseClient
                 .from('transaksi')
                 .insert([
                     { 
                         tipe: type, 
-                        jumlah: amount, 
+                        kategori: category,
                         keterangan: description, 
+                        jumlah: amount, 
                         tanggal: new Date().toISOString().split('T')[0] 
                     }
                 ]);
@@ -246,12 +262,12 @@
             const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
             let badgeColor = type === 'Pemasukan' ? 'text-emerald-400' : 'text-rose-400';
             
-            return `✅ Berhasil dicatat ke Jurnal Keuangan!<br>
+            return `✅ Berhasil dicatat otomatis!<br>
                 • Tipe: <span class="${badgeColor} font-bold">${type.toUpperCase()}</span><br>
+                • Kategori: <b>${category}</b><br>
                 • Jumlah: <b>${formatIDR(amount)}</b><br>
                 • Keterangan: ${description}`;
         }
-
         async function fetchAndShowSummary() {
             const { data, error } = await supabaseClient.from('transaksi').select('*');
             if (error) return "Gagal mengambil data dari database.";
