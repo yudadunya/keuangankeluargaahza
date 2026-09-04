@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ahza Capital - Financial & Family Accounting System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ahza Capital - Mobile & Family Accounting</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Supabase JS Client -->
@@ -11,113 +11,98 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans">
+<body class="bg-slate-900 text-slate-100 h-[100dvh] flex flex-col font-sans overflow-hidden">
 
-    <!-- Navbar -->
-    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center shadow-md">
-        <div class="flex items-center space-x-3">
-            <div class="bg-emerald-500 text-slate-900 p-2 rounded-xl font-bold flex items-center justify-center w-10 h-10 shadow-lg">
+    <!-- Mobile Header (Compact & Clean) -->
+    <header class="bg-slate-800 border-b border-slate-700 px-4 py-3 flex justify-between items-center shadow-md z-10 flex-shrink-0">
+        <div class="flex items-center space-x-2.5">
+            <div class="bg-emerald-500 text-slate-900 p-2 rounded-xl font-bold flex items-center justify-center w-8 h-8 shadow-lg text-sm">
                 <i class="fa-solid fa-brain"></i>
             </div>
             <div>
-                <h1 class="font-bold text-lg text-white">Ahza Capital</h1>
-                <p class="text-xs text-slate-400">Mind Master & Family Accounting</p>
+                <h1 class="font-bold text-sm text-white tracking-wide">Ahza Capital</h1>
+                <p class="text-[10px] text-slate-400">Mind Master & Accounting</p>
             </div>
         </div>
         
-        <!-- Navigation Tabs -->
-        <nav class="flex space-x-2 bg-slate-900 p-1 rounded-xl border border-slate-700">
-            <button onclick="switchTab('chat')" id="nav-chat" class="px-4 py-2 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer">
-                <i class="fa-solid fa-comments mr-1"></i> Chat AI Assistant
-            </button>
-            <button onclick="switchTab('report')" id="nav-report" class="px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white cursor-pointer">
-                <i class="fa-solid fa-file-invoice-dollar mr-1"></i> Laporan Keuangan Keluarga
-            </button>
-        </nav>
+        <!-- Status Indikator / Quick Action -->
+        <button onclick="loadFinancialReport()" class="bg-slate-700/60 hover:bg-slate-700 text-xs text-slate-300 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 border border-slate-600 active:scale-95">
+            <i class="fa-solid fa-rotate-right text-[10px]"></i> <span class="hidden sm:inline">Refresh</span>
+        </button>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-hidden flex flex-col relative">
+    <!-- Main Content Area (Full flex height between header and bottom nav) -->
+    <main class="flex-1 overflow-hidden flex flex-col relative pb-16 md:pb-0">
 
         <!-- VIEW 1: CHAT AI -->
-        <section id="view-chat" class="flex-1 flex flex-col h-full">
-            <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 max-w-4xl w-full mx-auto" id="chat-container">
+        <section id="view-chat" class="flex-1 flex flex-col h-full overflow-hidden">
+            <div class="flex-1 overflow-y-auto p-3 md:p-6 space-y-3 max-w-4xl w-full mx-auto" id="chat-container">
                 <!-- Pesan Sambutan Bot -->
-                <div class="flex items-start space-x-3">
-                    <div class="bg-emerald-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
-                    <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl rounded-tl-none max-w-[85%] md:max-w-xl text-sm leading-relaxed shadow">
+                <div class="flex items-start space-x-2.5">
+                    <div class="bg-emerald-500 text-slate-900 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">AI</div>
+                    <div class="bg-slate-800 border border-slate-700 p-3.5 rounded-2xl rounded-tl-none max-w-[88%] md:max-w-xl text-xs md:text-sm leading-relaxed shadow">
                         <p class="font-semibold text-emerald-400 mb-1">Halo Mind Master!</p>
-                        <p>Silakan catat transaksi atau tanyakan laporan keuangan secara natural:</p>
-                        <ul class="list-disc list-inside mt-2 space-y-1 text-slate-300">
-                            <li><i>"Pemasukan 4500000 dari omset Nadirasa"</i></li>
-                            <li><i>"Pengeluaran 1250000 untuk belanja bulanan"</i></li>
-                            <li><i>"Berapa total saldo dan rekap keuangan hari ini?"</i></li>
+                        <p class="text-slate-300">Catat keuangan harian secara otomatis lewat chat:</p>
+                        <ul class="list-disc list-inside mt-1.5 space-y-1 text-slate-400">
+                            <li><i>"beli bawang merah 6000"</i></li>
+                            <li><i>"pemasukan omset 4500000"</i></li>
+                            <li><i>"rekap keuangan"</i></li>
                         </ul>
                     </div>
                 </div>
             </div>
             
-            <!-- Chat Input Footer -->
-            <footer class="bg-slate-800 border-t border-slate-700 p-4 shadow-lg">
-                <form id="chat-form" class="max-w-4xl mx-auto flex gap-3">
+            <!-- Chat Input Footer (Floating sticky for mobile) -->
+            <footer class="bg-slate-800/90 backdrop-blur border-t border-slate-700 p-2.5 md:p-4 shadow-lg flex-shrink-0">
+                <form id="chat-form" class="max-w-4xl mx-auto flex gap-2">
                     <input 
                         type="text" 
                         id="user-input" 
-                        placeholder="Ketik transaksi (contoh: Pemasukan 400000)..." 
-                        class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition text-sm"
+                        placeholder="Ketik pengeluaran/pemasukan..." 
+                        class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition text-xs md:text-sm"
                         autocomplete="off"
                         required
                     >
-                    <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-semibold px-6 py-3 rounded-xl transition flex items-center justify-center shadow-lg cursor-pointer">
-                        <i class="fa-solid fa-paper-plane"></i>
+                    <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-900 font-semibold px-4 py-2.5 rounded-xl transition flex items-center justify-center shadow-lg cursor-pointer">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
                     </button>
                 </form>
             </footer>
         </section>
 
         <!-- VIEW 2: LAPORAN KEUANGAN KELUARGA (Standar Akuntansi) -->
-        <section id="view-report" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 max-w-6xl w-full mx-auto hidden">
-            <div class="flex justify-between items-center bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-lg">
-                <div>
-                    <h2 class="text-xl font-bold text-white">Laporan Posisi Keuangan Keluarga</h2>
-                    <p class="text-xs text-slate-400 mt-1">Standar Akuntansi Rumah Tangga & Arus Kas Ahza Capital</p>
+        <section id="view-report" class="flex-1 overflow-y-auto p-3 md:p-8 space-y-4 max-w-6xl w-full mx-auto hidden">
+            <!-- Summary Cards Grid (Stack on mobile, 3 cols on desktop) -->
+            <div class="grid grid-cols-3 gap-2 md:gap-4">
+                <div class="bg-slate-800 p-3 md:p-5 rounded-xl md:rounded-2xl border border-slate-700 shadow">
+                    <p class="text-[10px] md:text-xs font-medium text-slate-400 uppercase tracking-wider">Pemasukan</p>
+                    <p id="rep-total-masuk" class="text-sm md:text-2xl font-bold text-emerald-400 mt-1 truncate">Rp 0</p>
                 </div>
-                <button onclick="loadFinancialReport()" class="bg-slate-700 hover:bg-slate-600 text-xs text-slate-200 px-4 py-2 rounded-xl transition flex items-center gap-2 border border-slate-600 cursor-pointer">
-                    <i class="fa-solid fa-rotate-right"></i> Muat Ulang Data
-                </button>
-            </div>
-
-            <!-- Summary Cards Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow">
-                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Pemasukan (Kredit)</p>
-                    <p id="rep-total-masuk" class="text-2xl font-bold text-emerald-400 mt-2">Rp 0</p>
+                <div class="bg-slate-800 p-3 md:p-5 rounded-xl md:rounded-2xl border border-slate-700 shadow">
+                    <p class="text-[10px] md:text-xs font-medium text-slate-400 uppercase tracking-wider">Pengeluaran</p>
+                    <p id="rep-total-keluar" class="text-sm md:text-2xl font-bold text-rose-400 mt-1 truncate">Rp 0</p>
                 </div>
-                <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow">
-                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Pengeluaran (Debit)</p>
-                    <p id="rep-total-keluar" class="text-2xl font-bold text-rose-400 mt-2">Rp 0</p>
-                </div>
-                <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow">
-                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Saldo Bersih / Ekuitas</p>
-                    <p id="rep-net-saldo" class="text-2xl font-bold text-white mt-2">Rp 0</p>
+                <div class="bg-slate-800 p-3 md:p-5 rounded-xl md:rounded-2xl border border-slate-700 shadow">
+                    <p class="text-[10px] md:text-xs font-medium text-slate-400 uppercase tracking-wider">Saldo Bersih</p>
+                    <p id="rep-net-saldo" class="text-sm md:text-2xl font-bold text-white mt-1 truncate">Rp 0</p>
                 </div>
             </div>
 
-            <!-- Standard Accounting Table -->
-            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
-                    <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-book-journal-whills mr-2 text-emerald-400"></i> Jurnal Transaksi & Buku Besar</h3>
-                    <span id="rep-count" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 Transaksi Tercatat</span>
+            <!-- Standard Accounting Table Card -->
+            <div class="bg-slate-800 rounded-xl md:rounded-2xl border border-slate-700 shadow-lg overflow-hidden flex flex-col mb-4">
+                <div class="px-4 md:px-6 py-3 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+                    <h3 class="font-bold text-xs md:text-sm text-slate-200"><i class="fa-solid fa-book-journal-whills mr-1.5 text-emerald-400"></i> Jurnal Transaksi</h3>
+                    <span id="rep-count" class="text-[10px] md:text-xs bg-slate-700 text-slate-300 px-2.5 py-0.5 rounded-full">0 Transaksi</span>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm border-collapse">
+                <div class="overflow-x-auto max-h-[50vh] md:max-h-none">
+                    <table class="w-full text-left text-xs md:text-sm border-collapse whitespace-nowrap md:whitespace-normal">
                         <thead>
-                            <tr class="bg-slate-900/60 text-slate-400 text-xs border-b border-slate-700 uppercase tracking-wider">
-                                <th class="py-3 px-6">Tanggal</th>
-                                <th class="py-3 px-6">Keterangan / Akun</th>
-                                <th class="py-3 px-6">Tipe</th>
-                                <th class="py-3 px-6 text-right">Pemasukan (IDR)</th>
-                                <th class="py-3 px-6 text-right">Pengeluaran (IDR)</th>
+                            <tr class="bg-slate-900/60 text-slate-400 text-[10px] md:text-xs border-b border-slate-700 uppercase tracking-wider sticky top-0">
+                                <th class="py-2.5 px-3 md:px-6">Tanggal</th>
+                                <th class="py-2.5 px-3 md:px-6">Keterangan / Kategori</th>
+                                <th class="py-2.5 px-3 md:px-6">Tipe</th>
+                                <th class="py-2.5 px-3 md:px-6 text-right">Pemasukan</th>
+                                <th class="py-2.5 px-3 md:px-6 text-right">Pengeluaran</th>
                             </tr>
                         </thead>
                         <tbody id="accounting-table-body" class="divide-y divide-slate-700/50 text-slate-300">
@@ -130,7 +115,19 @@
 
     </main>
 
-    <!-- Script Aplikasi -->
+    <!-- Bottom Navigation Bar (Mobile Optimized) & Desktop Header Tabs Backup -->
+    <nav class="bg-slate-800 border-t border-slate-700 px-4 py-2 flex justify-around items-center shadow-2xl z-20 flex-shrink-0 md:absolute md:top-4 md:right-6 md:w-auto md:border md:rounded-xl md:p-1 md:space-x-1 md:shadow-none">
+        <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col md:flex-row items-center md:space-x-1.5 py-1 px-4 rounded-xl text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer">
+            <i class="fa-solid fa-comments text-sm md:text-xs"></i>
+            <span class="text-[10px] md:text-xs mt-0.5 md:mt-0">Chat AI</span>
+        </button>
+        <button onclick="switchTab('report')" id="nav-report" class="flex flex-col md:flex-row items-center md:space-x-1.5 py-1 px-4 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white cursor-pointer">
+            <i class="fa-solid fa-file-invoice-dollar text-sm md:text-xs"></i>
+            <span class="text-[10px] md:text-xs mt-0.5 md:mt-0">Laporan</span>
+        </button>
+    </nav>
+
+    <!-- Script Aplikasi Lengkap -->
     <script>
         // ==========================================
         // KONFIGURASI SUPABASE (Ganti dengan kredensial Anda)
@@ -140,23 +137,26 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Fungsi Perpindahan Tab (Navbar)
+        // Fungsi Perpindahan Tab (Responsive Mobile & Desktop)
         function switchTab(tab) {
             const chatView = document.getElementById('view-chat');
             const reportView = document.getElementById('view-report');
             const navChat = document.getElementById('nav-chat');
             const navReport = document.getElementById('nav-report');
 
+            const activeClass = "flex flex-col md:flex-row items-center md:space-x-1.5 py-1 px-4 rounded-xl text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer";
+            const inactiveClass = "flex flex-col md:flex-row items-center md:space-x-1.5 py-1 px-4 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white cursor-pointer";
+
             if (tab === 'chat') {
                 chatView.classList.remove('hidden');
                 reportView.classList.add('hidden');
-                navChat.className = "px-4 py-2 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer";
-                navReport.className = "px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white cursor-pointer";
+                navChat.className = activeClass;
+                navReport.className = inactiveClass;
             } else {
                 chatView.classList.add('hidden');
                 reportView.classList.remove('hidden');
-                navReport.className = "px-4 py-2 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer";
-                navChat.className = "px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white cursor-pointer";
+                navReport.className = activeClass;
+                navChat.className = inactiveClass;
                 loadFinancialReport(); // Ambil data saat tab laporan dibuka
             }
         }
@@ -169,17 +169,17 @@
         function appendMessage(sender, text, isHtml = false) {
             const isUser = sender === 'user';
             const wrapper = document.createElement('div');
-            wrapper.className = `flex items-start space-x-3 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+            wrapper.className = `flex items-start space-x-2.5 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
 
             let avatarHtml = isUser 
-                ? `<div class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">U</div>`
-                : `<div class="bg-emerald-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>`;
+                ? `<div class="bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">U</div>`
+                : `<div class="bg-emerald-500 text-slate-900 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">AI</div>`;
 
             let bubbleBg = isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-100 rounded-tl-none';
 
             wrapper.innerHTML = `
                 ${avatarHtml}
-                <div class="${bubbleBg} p-4 rounded-2xl max-w-[85%] md:max-w-xl text-sm leading-relaxed shadow">
+                <div class="${bubbleBg} p-3.5 rounded-2xl max-w-[85%] md:max-w-xl text-xs md:text-sm leading-relaxed shadow">
                     ${isHtml ? text : escapeHtml(text)}
                 </div>
             `;
@@ -193,7 +193,7 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-        // AI Command Processor dengan Auto-Kategori Cerdas & Otomatis
+        // AI Command Processor (Auto Tipe & Auto Kategori)
         async function processAICommand(text) {
             const lower = text.toLowerCase();
             
@@ -203,13 +203,13 @@
 
             const numberMatch = text.match(/(\d[\d\.,]*)/);
             if (!numberMatch) {
-                return "Maaf Mind Master, format perintah belum dikenali. Cukup ketik seperti: <b>'beli bawang merah 6000'</b> atau <b>'pemasukan gaji 5000000'</b>.";
+                return "Maaf, format belum dikenali. Cukup ketik: <b>'beli bawang merah 6000'</b> atau <b>'pemasukan gaji 5000000'</b>.";
             }
 
             let rawNum = numberMatch[0].replace(/\./g, '').replace(/,/g, '');
             let amount = parseFloat(rawNum);
 
-            // 1. Deteksi Tipe Otomatis (Pemasukan / Pengeluaran)
+            // Deteksi Tipe Otomatis
             let type = 'Pengeluaran';
             if (
                 lower.includes('masuk') || 
@@ -223,7 +223,7 @@
                 type = 'Pemasukan';
             }
 
-            // 2. Deteksi Kategori Otomatis berdasarkan kata kunci
+            // Deteksi Kategori Otomatis
             let category = 'Umum';
             if (lower.includes('makan') || lower.includes('beli') || lower.includes('bawang') || lower.includes('sayur') || lower.includes('beras') || lower.includes('dapur') || lower.includes('minum')) {
                 category = 'Konsumsi & Dapur';
@@ -237,11 +237,10 @@
                 category = 'Inflow / Pendapatan';
             }
 
-            // 3. Keterangan lengkap dari sisa teks chat
             let description = text.replace(numberMatch[0], '').replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp/gi, '').trim();
-            if (!description) description = text; // Jika kosong, ambil seluruh kalimat user
+            if (!description) description = text;
 
-            // Menyimpan ke Supabase lengkap dengan mengisi kolom 'kategori'
+            // Simpan ke Supabase
             const { data, error } = await supabaseClient
                 .from('transaksi')
                 .insert([
@@ -255,19 +254,20 @@
                 ]);
 
             if (error) {
-                console.error(error);
+                console.h(error);
                 return `❌ Gagal menyimpan ke database Supabase: ${error.message}`;
             }
 
             const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
             let badgeColor = type === 'Pemasukan' ? 'text-emerald-400' : 'text-rose-400';
             
-            return `✅ Berhasil dicatat otomatis!<br>
+            return `✅ Tercatat Otomatis!<br>
                 • Tipe: <span class="${badgeColor} font-bold">${type.toUpperCase()}</span><br>
                 • Kategori: <b>${category}</b><br>
                 • Jumlah: <b>${formatIDR(amount)}</b><br>
                 • Keterangan: ${description}`;
         }
+
         async function fetchAndShowSummary() {
             const { data, error } = await supabaseClient.from('transaksi').select('*');
             if (error) return "Gagal mengambil data dari database.";
@@ -292,7 +292,7 @@
                 • Total Pemasukan: <span class="text-emerald-400">${formatIDR(totalMasuk)}</span><br>
                 • Total Pengeluaran: <span class="text-rose-400">${formatIDR(totalKeluar)}</span><br>
                 • <b>Saldo Bersih: ${formatIDR(saldo)}</b><br>
-                <span class="text-xs text-slate-400">Total ${data.length} transaksi tercatat. Buka menu 'Laporan Keuangan Keluarga' untuk rincian akuntansi standar.</span>`;
+                <span class="text-[10px] text-slate-400">Total ${data.length} transaksi tercatat. Buka menu Laporan untuk rincian tabel akuntansi.</span>`;
         }
 
         // Load Financial Accounting Report Table
@@ -300,7 +300,7 @@
             const tbody = document.getElementById('accounting-table-body');
             if (!tbody) return;
             
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat data akuntansi...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>`;
 
             const { data, error } = await supabaseClient.from('transaksi').select('*').order('tanggal', { ascending: false });
             
@@ -314,11 +314,11 @@
             tbody.innerHTML = '';
 
             if (!data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-500">Belum ada data transaksi tercatat.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-500">Belum ada data transaksi.</td></tr>`;
                 document.getElementById('rep-total-masuk').innerText = 'Rp 0';
                 document.getElementById('rep-total-keluar').innerText = 'Rp 0';
                 document.getElementById('rep-net-saldo').innerText = 'Rp 0';
-                document.getElementById('rep-count').innerText = '0 Transaksi Tercatat';
+                document.getElementById('rep-count').innerText = '0 Transaksi';
                 return;
             }
 
@@ -333,17 +333,20 @@
                 else totalKeluar += jml;
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-700/35 transition";
+                tr.className = "hover:bg-slate-700/35 transition text-xs";
                 tr.innerHTML = `
-                    <td class="py-3 px-6 text-xs text-slate-400">${row.tanggal || '-'}</td>
-                    <td class="py-3 px-6 font-medium text-white">${escapeHtml(row.keterangan || row.kategori || '-')}</td>
-                    <td class="py-3 px-6">
-                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${isMasuk ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+                    <td class="py-2.5 px-3 md:px-6 text-slate-400">${row.tanggal || '-'}</td>
+                    <td class="py-2.5 px-3 md:px-6 font-medium text-white">
+                        ${escapeHtml(row.keterangan || '-')}
+                        <div class="text-[10px] text-slate-400 md:hidden">${escapeHtml(row.kategori || '')}</div>
+                    </td>
+                    <td class="py-2.5 px-3 md:px-6">
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${isMasuk ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
                             ${row.tipe ? row.tipe.toUpperCase() : (isMasuk ? 'PEMASUKAN' : 'PENGELUARAN')}
                         </span>
                     </td>
-                    <td class="py-3 px-6 text-right font-semibold ${isMasuk ? 'text-emerald-400' : 'text-slate-600'}">${isMasuk ? formatIDR(jml) : '-'}</td>
-                    <td class="py-3 px-6 text-right font-semibold ${!isMasuk ? 'text-rose-400' : 'text-slate-600'}">${!isMasuk ? formatIDR(jml) : '-'}</td>
+                    <td class="py-2.5 px-3 md:px-6 text-right font-semibold ${isMasuk ? 'text-emerald-400' : 'text-slate-600'}">${isMasuk ? formatIDR(jml) : '-'}</td>
+                    <td class="py-2.5 px-3 md:px-6 text-right font-semibold ${!isMasuk ? 'text-rose-400' : 'text-slate-600'}">${!isMasuk ? formatIDR(jml) : '-'}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -355,12 +358,12 @@
             
             const saldoEl = document.getElementById('rep-net-saldo');
             if (saldoEl) {
-                saldoEl.className = `text-2xl font-bold mt-2 ${saldoBersih >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+                saldoEl.className = `text-sm md:text-2xl font-bold mt-1 ${saldoBersih >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
             }
             
             const countEl = document.getElementById('rep-count');
             if (countEl) {
-                countEl.innerText = `${data.length} Transaksi Tercatat`;
+                countEl.innerText = `${data.length} Transaksi`;
             }
         }
 
@@ -376,11 +379,11 @@
             const loadingId = 'loading-' + Date.now();
             const loadingWrapper = document.createElement('div');
             loadingWrapper.id = loadingId;
-            loadingWrapper.className = `flex items-start space-x-3`;
+            loadingWrapper.className = `flex items-start space-x-2.5`;
             loadingWrapper.innerHTML = `
-                <div class="bg-emerald-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
-                <div class="bg-slate-800 border border-slate-700 text-slate-400 p-4 rounded-2xl rounded-tl-none text-sm shadow animate-pulse">
-                    Memproses perintah ke database akuntansi...
+                <div class="bg-emerald-500 text-slate-900 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">AI</div>
+                <div class="bg-slate-800 border border-slate-700 text-slate-400 p-3.5 rounded-2xl rounded-tl-none text-xs shadow animate-pulse">
+                    Mencatat otomatis ke database...
                 </div>
             `;
             chatContainer.appendChild(loadingWrapper);
