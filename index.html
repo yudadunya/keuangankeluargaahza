@@ -3,255 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ahza Capital - Manajemen Keuangan</title>
-    <!-- Tailwind CSS untuk Styling Modern -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Ahza Capital - AI Financial Assistant</title>
+    <!-- Tailwind CSS untuk styling yang rapi dan modern -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+    <!-- FontAwesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
+<body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans">
 
     <!-- Header / Navbar -->
-    <header class="bg-slate-900 text-white shadow-md">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-tight">Ahza Capital <span class="text-blue-400 text-sm font-normal">| Financial Dashboard</span></h1>
-            <div id="status-sync" class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-medium flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Sinkron Supabase
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center shadow-md">
+        <div class="flex items-center space-x-3">
+            <div class="bg-emerald-500 text-slate-900 p-2 rounded-xl font-bold flex items-center justify-center w-10 h-10 shadow-lg">
+                <i class="fa-solid fa-brain"></i>
             </div>
+            <div>
+                <h1 class="font-bold text-lg text-white">Ahza Capital AI</h1>
+                <p class="text-xs text-slate-400">Mind Master & Financial Assistant</p>
+            </div>
+        </div>
+        <div id="connection-status" class="text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <i class="fa-solid fa-circle text-[8px] mr-1"></i> Terhubung ke Supabase
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 mt-6 space-y-6">
-
-        <!-- Kartu Ringkasan (Summary Cards) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Saldo</p>
-                <h2 id="val-saldo" class="text-2xl font-bold text-slate-900 mt-1">Rp 0</h2>
+    <!-- Main Chat Container -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 max-w-4xl w-full mx-auto" id="chat-container">
+        <!-- Pesan Sambutan Bot -->
+        <div class="flex items-start space-x-3">
+            <div class="bg-emerald-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">
+                AI
             </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                <p class="text-xs font-medium text-emerald-600 uppercase tracking-wider">Total Pemasukan</p>
-                <h2 id="val-pemasukan" class="text-2xl font-bold text-emerald-600 mt-1">Rp 0</h2>
-            </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                <p class="text-xs font-medium text-rose-600 uppercase tracking-wider">Total Pengeluaran</p>
-                <h2 id="val-pengeluaran" class="text-2xl font-bold text-rose-600 mt-1">Rp 0</h2>
-            </div>
-        </div>
-
-        <!-- Form Input Transaksi -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-            <h3 class="text-base font-semibold text-slate-800 mb-4">Tambah Transaksi Baru</h3>
-            <form id="form-transaksi" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Tanggal</label>
-                    <input type="date" id="input-tanggal" required class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Tipe</label>
-                    <select id="input-tipe" class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="Pemasukan">Pemasukan</option>
-                        <option value="Pengeluaran">Pengeluaran</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Kategori</label>
-                    <input type="text" id="input-kategori" placeholder="Contoh: Gaji / Belanja" required class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Jumlah (Rp)</label>
-                    <input type="number" id="input-jumlah" placeholder="0" required class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" id="btn-simpan" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition shadow-sm">
-                        Simpan
-                    </button>
-                </div>
-            </form>
-            <div class="mt-2">
-                <input type="text" id="input-keterangan" placeholder="Keterangan tambahan (opsional)" class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl rounded-tl-none max-w-[85%] md:max-w-xl text-sm leading-relaxed shadow">
+                <p class="font-semibold text-emerald-400 mb-1">Halo Mind Master!</p>
+                <p>Saya asisten keuangan Anda. Cukup ketik transaksi Anda secara natural, contohnya:</p>
+                <ul class="list-disc list-inside mt-2 space-y-1 text-slate-300">
+                    <li><i>"Catat pemasukan 150000 dari penjualan produk"</i></li>
+                    <li><i>"Pengeluaran 35000 untuk beli bahan baku"</i></li>
+                    <li><i>"Berapa total saldo dan rekap hari ini?"</i></li>
+                </ul>
             </div>
         </div>
-
-        <!-- Tabel Riwayat Transaksi -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="text-base font-semibold text-slate-800">Riwayat Transaksi</h3>
-                <span id="counter-data" class="text-xs text-slate-400">Memuat data...</span>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-100">
-                            <th class="py-3 px-4 font-semibold">Tanggal</th>
-                            <th class="py-3 px-4 font-semibold">Tipe</th>
-                            <th class="py-3 px-4 font-semibold">Kategori & Keterangan</th>
-                            <th class="py-3 px-4 font-semibold text-right">Jumlah</th>
-                            <th class="py-3 px-4 font-semibold text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabel-transaksi" class="divide-y divide-slate-100 text-sm">
-                        <!-- Data akan dimasukkan lewat Javascript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
     </main>
 
+    <!-- Input Area -->
+    <footer class="bg-slate-800 border-t border-slate-700 p-4 shadow-lg">
+        <form id="chat-form" class="max-w-4xl mx-auto flex gap-3">
+            <input 
+                type="text" 
+                id="user-input" 
+                placeholder="Ketik transaksi atau tanyakan laporan keuangan..." 
+                class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition text-sm"
+                autocomplete="off"
+                required
+            >
+            <button 
+                type="submit" 
+                class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-semibold px-6 py-3 rounded-xl transition flex items-center justify-center shadow-lg cursor-pointer"
+            >
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </footer>
+
+    <!-- Script Konfigurasi & Logika AI Sederhana -->
     <script>
-        // =================================================================
-        // MASUKKAN KUNCI SUPABASE ANDA DI SINI
-        // =================================================================
+        // ==========================================
+        // KONFIGURASI SUPABASE (Sesuaikan kredensial Anda)
+        // ==========================================
         const SUPABASE_URL = 'https://cskfciznhglcxceigvfy.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNza2ZjaXpuaGdsY3hjZWlndmZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MTYwODUsImV4cCI6MjEwNDA5MjA4NX0.4V90m6E3oB0ued2mOhaeu-IZ9IbRQ2pHXVEO43gN16o';
         
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Set default tanggal hari ini pada form
-        document.getElementById('input-tanggal').valueAsDate = new Date();
+        const chatContainer = document.getElementById('chat-container');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
 
-        let listTransaksi = [];
+        // Fungsi Menambahkan Pesan ke Chat
+        function appendMessage(sender, text, isHtml = false) {
+            const isUser = sender === 'user';
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex items-start space-x-3 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
 
-        // Fungsi format ke Rupiah
-        function formatRupiah(angka) {
-            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+            let avatarHtml = isUser 
+                ? `<div class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">U</div>`
+                : `<div class="bg-emerald-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>`;
+
+            let bubbleBg = isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-100 rounded-tl-none';
+
+            wrapper.innerHTML = `
+                ${avatarHtml}
+                <div class="${bubbleBg} p-4 rounded-2xl max-w-[85%] md:max-w-xl text-sm leading-relaxed shadow">
+                    ${isHtml ? text : escapeHtml(text)}
+                </div>
+            `;
+
+            chatContainer.appendChild(wrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        // Ambil Data dari Supabase
-        async function ambilData() {
-            try {
-                const { data, error } = await _supabase
-                    .from('transaksi')
-                    .select('*')
-                    .order('tanggal', { ascending: false });
-
-                if (error) throw error;
-                listTransaksi = data || [];
-                renderUI();
-            } catch (err) {
-                console.error('Gagal mengambil data:', err.message);
-                document.getElementById('counter-data').innerText = 'Gagal sinkron database';
-            }
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-        // Render Tampilan UI
-        function renderUI() {
-            let totalPemasukan = 0;
-            let totalPengeluaran = 0;
-            const tbody = document.getElementById('tabel-transaksi');
-            tbody.innerHTML = '';
-
-            if (listTransaksi.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Belum ada data transaksi.</td></tr>`;
-                document.getElementById('counter-data').innerText = '0 transaksi';
-            } else {
-                document.getElementById('counter-data').innerText = `${listTransaksi.length} transaksi`;
+        // Parsing Pintar untuk Input Chat (Mendeteksi Nominal & Jenis Transaksi)
+        async function processAICommand(text) {
+            const lower = text.toLowerCase();
+            
+            // Cek jika menanyakan ringkasan/rekap
+            if (lower.includes('rekap') || lower.includes('saldo') || lower.includes('laporan') || lower.includes('total')) {
+                return await fetchAndShowSummary();
             }
 
-            listTransaksi.forEach((item) => {
-                if (item.tipe === 'Pemasukan') {
-                    totalPemasukan += Number(item.jumlah);
+            // Deteksi Pencatatan Transaksi (Pemasukan / Pengeluaran)
+            // Mencari angka di dalam teks (mengabaikan titik/koma)
+            const numberMatch = text.match(/(\d[\d\.,]*)/);
+            
+            if (!numberMatch) {
+                return "Maaf Mind Master, saya belum bisa memahami perintah tersebut. Coba gunakan format seperti: <b>'Pemasukan 50000 dari jual kopi'</b> atau <b>'Pengeluaran 15000 beli bensin'</b>.";
+            }
+
+            // Membersihkan format angka (mengubah "50.000" atau "50,000" jadi integer 50000)
+            let rawNum = numberMatch[0].replace(/\./g, '').replace(/,/g, '');
+            let amount = parseFloat(rawNum);
+
+            let type = 'keluar'; // default
+            if (lower.includes('masuk') || lower.includes('pemasukan') || lower.includes('terima') || lower.includes('jual')) {
+                type = 'masuk';
+            }
+
+            // Keterangan diambil dari sisa teks setelah angka/kata kunci
+            let description = text.replace(numberMatch[0], '').replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp/gi, '').trim();
+            if (!description) description = type === 'masuk' ? 'Pemasukan Tunai' : 'Pengeluaran Tunai';
+
+            // Simpan ke Supabase ke tabel 'transaksi' (sesuaikan nama kolom tabel Anda: jenis, jumlah, keterangan, tanggal)
+            const { data, error } = await supabaseClient
+                .from('transaksi')
+                .insert([
+                    { 
+                        jenis: type, 
+                        jumlah: amount, 
+                        keterangan: description, 
+                        tanggal: new Date().toISOString().split('T')[0] 
+                    }
+                ]);
+
+            if (error) {
+                console.error(error);
+                return `❌ Gagal menyimpan ke database Supabase: ${error.message}`;
+            }
+
+            const formattedAmount = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
+            let badgeColor = type === 'masuk' ? 'text-emerald-400' : 'text-rose-400';
+            
+            return `✅ Berhasil dicatat!<br>
+                • Jenis: <span class="${badgeColor} font-bold">${type.toUpperCase()}</span><br>
+                • Jumlah: <b>${formattedAmount}</b><br>
+                • Keterangan: ${description}`;
+        }
+
+        // Ambil Ringkasan dari Supabase
+        async function fetchAndShowSummary() {
+            const { data, error } = await supabaseClient.from('transaksi').select('*');
+            if (error) return "Gagal mengambil data dari database.";
+
+            let totalMasuk = 0;
+            let totalKeluar = 0;
+
+            data.forEach(row => {
+                let jml = parseFloat(row.jumlah) || 0;
+                if (row.jenis && row.jenis.toLowerCase() === 'masuk') {
+                    totalMasuk += jml;
                 } else {
-                    totalPengeluaran += Number(item.jumlah);
+                    totalKeluar += jml;
                 }
-
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50/55 transition';
-                tr.innerHTML = `
-                    <td class="py-3 px-4 text-slate-600 whitespace-nowrap">${item.tanggal}</td>
-                    <td class="py-3 px-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.tipe === 'Pemasukan' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">
-                            ${item.tipe}
-                        </span>
-                    </td>
-                    <td class="py-3 px-4 text-slate-800">
-                        <div class="font-medium">${item.kategori}</div>
-                        <div class="text-xs text-slate-400">${item.keterangan || '-'}</div>
-                    </td>
-                    <td class="py-3 px-4 text-right font-semibold ${item.tipe === 'Pemasukan' ? 'text-emerald-600' : 'text-slate-800'}">
-                        ${item.tipe === 'Pemasukan' ? '+' : '-'} ${formatRupiah(item.jumlah)}
-                    </td>
-                    <td class="py-3 px-4 text-center">
-                        <button onclick="hapusData(${item.id})" class="text-slate-400 hover:text-rose-600 p-1 rounded transition" title="Hapus">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
             });
 
-            const totalSaldo = totalPemasukan - totalPengeluaran;
-            document.getElementById('val-saldo').innerText = formatRupiah(totalSaldo);
-            document.getElementById('val-pemasukan').innerText = formatRupiah(totalPemasukan);
-            document.getElementById('val-pengeluaran').innerText = formatRupiah(totalPengeluaran);
+            let saldo = totalMasuk - totalKeluar;
+            const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
+
+            return `📊 <b>Ringkasan Keuangan Ahza Capital:</b><br>
+                • Total Pemasukan: <span class="text-emerald-400">${formatIDR(totalMasuk)}</span><br>
+                • Total Pengeluaran: <span class="text-rose-400">${formatIDR(totalKeluar)}</span><br>
+                • <b>Saldo Bersih: ${formatIDR(saldo)}</b><br>
+                <span class="text-xs text-slate-400">Total ${data.length} transaksi tercatat dalam sistem.</span>`;
         }
 
-        // Simpan Data Baru ke Supabase
-        document.getElementById('form-transaksi').addEventListener('submit', async function(e) {
+        // Handle Submit Form Chat
+        chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btnSimpan = document.getElementById('btn-simpan');
-            btnSimpan.disabled = true;
-            btnSimpan.innerText = 'Menyimpan...';
+            const text = userInput.value.trim();
+            if (!text) return;
 
-            const dataBaru = {
-                tanggal: document.getElementById('input-tanggal').value,
-                tipe: document.getElementById('input-tipe').value,
-                kategori: document.getElementById('input-kategori').value,
-                jumlah: parseFloat(document.getElementById('input-jumlah').value),
-                keterangan: document.getElementById('input-keterangan').value
-            };
+            // Tampilkan pesan user
+            appendMessage('user', text);
+            userInput.value = '';
 
-            try {
-                const { error } = await _supabase.from('transaksi').insert([dataBaru]);
-                if (error) throw error;
+            // Tampilkan status "AI sedang berpikir..."
+            const loadingId = 'loading-' + Date.now();
+            const loadingWrapper = document.createElement('div');
+            loadingWrapper.id = loadingId;
+            loadingWrapper.className = `flex items-start space-x-3`;
+            loadingWrapper.innerHTML = `
+                <div class="bg-emerald-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
+                <div class="bg-slate-800 border border-slate-700 text-slate-400 p-4 rounded-2xl rounded-tl-none text-sm shadow animate-pulse">
+                    Memproses perintah ke database...
+                </div>
+            `;
+            chatContainer.appendChild(loadingWrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
 
-                // Reset form input ringan
-                document.getElementById('input-kategori').value = '';
-                document.getElementById('input-jumlah').value = '';
-                document.getElementById('input-keterangan').value = '';
-                document.getElementById('input-tanggal').valueAsDate = new Date();
-                
-                await ambilData();
-            } catch (err) {
-                alert('Gagal menyimpan transaksi: ' + err.message);
-            } finally {
-                btnSimpan.disabled = false;
-                btnSimpan.innerText = 'Simpan';
-            }
+            // Proses AI & Database
+            const aiResponse = await processAICommand(text);
+
+            // Hapus elemen loading
+            document.getElementById(loadingId).remove();
+
+            // Tampilkan balasan AI
+            appendMessage('ai', aiResponse, true);
         });
-
-        // Hapus Data
-        async function hapusData(id) {
-            if (!confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) return;
-
-            try {
-                const { error } = await _supabase.from('transaksi').delete().eq('id', id);
-                if (error) throw error;
-                await ambilData();
-            } catch (err) {
-                alert('Gagal menghapus: ' + err.message);
-            }
-        }
-
-        // Jalankan saat pertama kali dibuka & pasang Real-time listener
-        ambilData();
-
-        // Fitur Realtime: Otomatis update di Laptop B jika Laptop A nambah data
-        _supabase
-            .channel('public:transaksi')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, payload => {
-                ambilData();
-            })
-            .subscribe();
     </script>
 </body>
 </html>
