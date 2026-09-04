@@ -194,23 +194,33 @@
         }
 
         // AI Command Processor
+        // Parsing Pintar untuk Input Chat (Diperbaiki agar akurat mendeteksi pemasukan)
         async function processAICommand(text) {
             const lower = text.toLowerCase();
             
-            if (lower.includes('rekap') || lower.includes('saldo') || lower.includes('laporan') || lower.includes('total')) {
+            if (lower.includes('rekap') || lower.includes('saldo laporan') || lower.includes('total')) {
                 return await fetchAndShowSummary();
             }
 
             const numberMatch = text.match(/(\d[\d\.,]*)/);
             if (!numberMatch) {
-                return "Maaf Mind Master, format perintah belum dikenali. Gunakan contoh: <b>'Pemasukan 150rb'</b> atau <b>'Pengeluaran 35rb untuk bensin'</b>.";
+                return "Maaf Mind Master, format perintah belum dikenali. Gunakan contoh: <b>'Pemasukan 400000'</b> atau <b>'Pengeluaran 35rb'</b>.";
             }
 
             let rawNum = numberMatch[0].replace(/\./g, '').replace(/,/g, '');
             let amount = parseFloat(rawNum);
 
-            let type = 'keluar';
-            if (lower.includes('masuk') || lower.includes('pemasukan') || lower.includes('terima') || lower.includes('jual') || lower.includes('omset')) {
+            // LOGIKA DIPERBAIKI: Deteksi eksplisit untuk Pemasukan / Saldo Awal / Terima
+            let type = 'keluar'; // default
+            if (
+                lower.includes('masuk') || 
+                lower.includes('pemasukan') || 
+                lower.includes('terima') || 
+                lower.includes('jual') || 
+                lower.includes('omset') ||
+                lower.includes('saldo awal') ||
+                lower.includes('uang sebelumnya')
+            ) {
                 type = 'masuk';
             }
 
@@ -241,7 +251,6 @@
                 • Jumlah: <b>${formatIDR(amount)}</b><br>
                 • Keterangan: ${description}`;
         }
-
         async function fetchAndShowSummary() {
             const { data, error } = await supabaseClient.from('transaksi').select('*');
             if (error) return "Gagal mengambil data dari database.";
