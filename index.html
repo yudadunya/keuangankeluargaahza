@@ -278,6 +278,7 @@
         }
 
         // Load Financial Accounting Report Table
+        // Load Financial Accounting Report Table (Diperbaiki menggunakan kolom 'tipe')
         async function loadFinancialReport() {
             const tbody = document.getElementById('accounting-table-body');
             tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat data akuntansi...</td></tr>`;
@@ -306,7 +307,10 @@
 
             data.forEach(row => {
                 let jml = parseFloat(row.jumlah) || 0;
-                let isMasuk = row.jenis && row.jenis.toLowerCase() === 'masuk';
+                
+                // MENGGUNAKAN KOLOM 'tipe' SESUAI SUPABASE ANDA
+                let tipeVal = row.tipe ? row.tipe.toLowerCase() : '';
+                let isMasuk = tipeVal.includes('masuk');
                 
                 if (isMasuk) totalMasuk += jml;
                 else totalKeluar += jml;
@@ -315,10 +319,10 @@
                 tr.className = "hover:bg-slate-700/30 transition";
                 tr.innerHTML = `
                     <td class="py-3 px-6 text-xs text-slate-400">${row.tanggal || '-'}</td>
-                    <td class="py-3 px-6 font-medium text-white">${escapeHtml(row.keterangan || '-')}</td>
+                    <td class="py-3 px-6 font-medium text-white">${escapeHtml(row.keterangan || row.kategori || '-')}</td>
                     <td class="py-3 px-6">
                         <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${isMasuk ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
-                            ${isMasuk ? 'PEMASUKAN' : 'PENGELUARAN'}
+                            ${row.tipe ? row.tipe.toUpperCase() : (isMasuk ? 'PEMASUKAN' : 'PENGELUARAN')}
                         </span>
                     </td>
                     <td class="py-3 px-6 text-right font-semibold ${isMasuk ? 'text-emerald-400' : 'text-slate-600'}">${isMasuk ? formatIDR(jml) : '-'}</td>
@@ -331,10 +335,9 @@
             document.getElementById('rep-total-masuk').innerText = formatIDR(totalMasuk);
             document.getElementById('rep-total-keluar').innerText = formatIDR(totalKeluar);
             document.getElementById('rep-net-saldo').innerText = formatIDR(saldoBersih);
-            document.getElementById('rep-net-saldo').className = `text-2xl font-bold mt-2 ${saldoBersih >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+            document.getElementById('rep-net-saldoclassName = `text-2xl font-bold mt-2 ${saldoBersih >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
             document.getElementById('rep-count').innerText = `${data.length} Transaksi Tercatat`;
         }
-
         // Event Listener Chat Submit
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
