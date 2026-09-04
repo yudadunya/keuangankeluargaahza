@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Keuangan Keluarga - Ahza Capital</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --border: #e0e0e0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .nav-btn {
+            background-color: #bdc3c7;
+            color: var(--primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .nav-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .summary-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .summary-item h3 {
+            margin: 0 0 5px 0;
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .summary-item p {
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .saldo-riil {
+            color: var(--success);
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        input, select, textarea {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .btn-danger {
+            background-color: var(--danger);
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f1f2f6;
+            color: var(--primary);
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-secondary {
+            background-color: #7f8c8d;
+        }
+        .chat-box {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            background: #fafafa;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-msg {
+            padding: 10px 14px;
+            border-radius: 8px;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+        .chat-user {
+            background: #d4efdf;
+            align-self: flex-end;
+            color: #145a32;
+        }
+        .chat-ai {
+            background: #ebedef;
+            align-self: flex-start;
+            color: #2c3e50;
+        }
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Aplikasi Keuangan Keluarga</h1>
+        <p>Ahza Capital Ledger - Berbasis Prinsip Akuntansi Dasar</p>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="nav-btn active" onclick="switchTab('jurnal')">Jurnal & Buku Kas</button>
+        <button class="nav-btn" onclick="switchTab('asisten')">Asisten Chat Pintar</button>
+    </div>
+
+    <!-- TAB 1: JURNAL & BUKU KAS -->
+    <div id="tab-jurnal" class="tab-content active">
+        <div class="summary-card">
+            <div class="summary-item">
+                <h3>Total Pemasukan (Inflow)</h3>
+                <p id="totalMasuk">Rp 0</p>
+            </div>
+            <div class="summary-item">
+                <h3>Total Pengeluaran (Outflow)</h3>
+                <p id="totalKeluar" style="color: var(--danger);">Rp 0</p>
+            </div>
+            <div class="summary-item">
+                <h3>Sisa Saldo Berjalan</h3>
+                <p id="sisaKas" class="saldo-riil">Rp 0</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Tambah Transaksi Baru</h3>
+            <div class="form-grid">
+                <input type="date" id="tglInput">
+                <input type="text" id="ketInput" placeholder="Keterangan / Nama Transaksi">
+                <select id="katInput">
+                    <option value="Modal">Modal / Saldo Awal</option>
+                    <option value="Inflow">Inflow (Pemasukan)</option>
+                    <option value="Dapur">Dapur</option>
+                    <option value="Anak / Kebutuhan">Anak / Kebutuhan</option>
+                    <option value="Konsumsi / Jajan">Konsumsi / Jajan</option>
+                    <option value="Transportasi">Transportasi</option>
+                    <option value="Perlengkapan / Usaha">Perlengkapan / Usaha</option>
+                    <option value="Buah / Konsumsi">Buah / Konsumsi</option>
+                    <option value="Lain-lain">Lain-lain</option>
+                </select>
+                <select id="tipeInput">
+                    <option value="keluar">Pengeluaran (Kredit)</option>
+                    <option value="masuk">Pemasukan (Debit)</option>
+                </select>
+                <input type="number" id="jumlahInput" placeholder="Jumlah (Nominal)">
+            </div>
+            <button onclick="tambahTransaksiManual()">Simpan Transaksi</button>
+        </div>
+
+        <div class="card">
+            <h3>Riwayat Buku Kas & Saldo Berjalan</h3>
+            <div style="overflow-x: auto;">
+                <table id="tabelTransaksi">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Keterangan / Jenis</th>
+                            <th>Kategori</th>
+                            <th class="text-right">Debit (Masuk)</th>
+                            <th class="text-right">Kredit (Keluar)</th>
+                            <th class="text-right">Saldo Berjalan</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="isiTabel"></tbody>
+                </table>
+            </div>
+            <div class="actions">
+                <button class="btn-secondary" onclick="exportData()">Export Data ke File (JSON)</button>
+                <button class="btn-danger" onclick="resetDataDefault()">Reset ke Data Excel Asli</button>
+                <button class="btn-danger" onclick="kosongkanSemuaData()">Kosongkan Semua Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: ASISTEN CHAT PINTAR -->
+    <div id="tab-asisten" class="tab-content">
+        <div class="card">
+            <h3>Asisten Pintar Pencatatan Keuangan</h3>
+            <p style="font-size: 13px; color: #666;">Ketik perintah atau transaksi Anda secara natural, misal: <em>"beli bensin 25rb"</em>, <em>"pemasukan tambahan 150rb"</em>, atau <em>"jajan es teh 5000"</em>.</p>
+            
+            <div class="chat-box" id="chatBox">
+                <div class="chat-msg chat-ai">Halo! Seluruh data Excel Anda telah dimuat. Silakan ketik transaksi pengeluaran atau pemasukan baru di bawah ini untuk dicatat otomatis.</div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Contoh: beli makan siang 15rb..." onkeypress="handleChatKey(event)">
+                <button onclick="prosesChatAI()">Kirim</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let dataDefault = [
+        {tanggal: "2026-09-04", ket: "Saldo Awal / Uang Sebelumnya", kat: "Modal", masuk: 48500, keluar: 0},
+        {tanggal: "2026-09-04", ket: "Pemasukan 1", kat: "Inflow", masuk: 400000, keluar: 0},
+        {tanggal: "2026-09-04", ket: "Pemasukan 2", kat: "Inflow", masuk: 50000, keluar: 0},
+        {tanggal: "2026-09-04", ket: "Pemasukan Tambahan", kat: "Inflow", masuk: 100000, keluar: 0},
+        {tanggal: "2026-09-04", ket: "Bensin", kat: "Transportasi", masuk: 0, keluar: 20000},
+        {tanggal: "2026-09-04", ket: "Gula merah 250gr", kat: "Dapur", masuk: 0, keluar: 4500},
+        {tanggal: "2026-09-04", ket: "Kaka", kat: "Anak / Kebutuhan", masuk: 0, keluar: 225000},
+        {tanggal: "2026-09-04", ket: "Beras", kat: "Dapur", masuk: 0, keluar: 46500},
+        {tanggal: "2026-09-04", ket: "Peuteuy", kat: "Dapur", masuk: 0, keluar: 55000},
+        {tanggal: "2026-09-04", ket: "Anggur", kat: "Buah / Konsumsi", masuk: 0, keluar: 20000},
+        {tanggal: "2026-09-04", ket: "Susu Dede", kat: "Anak", masuk: 0, keluar: 3500},
+        {tanggal: "2026-09-04", ket: "Twinwall puding", kat: "Perlengkapan / Usaha", masuk: 0, keluar: 22000},
+        {tanggal: "2026-09-04", ket: "Es jeruk peras", kat: "Konsumsi / Jajan", masuk: 0, keluar: 40000},
+        {tanggal: "2026-09-04", ket: "Jajan", kat: "Konsumsi / Jajan", masuk: 0, keluar: 7000},
+        {tanggal: "2026-09-04", ket: "Beli buah-buahan", kat: "Buah / Konsumsi", masuk: 0, keluar: 58000},
+        {tanggal: "2026-09-04", ket: "Beli anggur lagi", kat: "Buah / Konsumsi", masuk: 0, keluar: 10000},
+        {tanggal: "2026-09-04", ket: "Basotahu mang Jaja", kat: "Konsumsi / Jajan", masuk: 0, keluar: 10000},
+        {tanggal: "2026-09-04", ket: "Cilor", kat: "Konsumsi / Jajan", masuk: 0, keluar: 10000},
+        {tanggal: "2026-09-04", ket: "Nasi Padang", kat: "Konsumsi / Makan", masuk: 0, keluar: 12000}
+    ];
+
+    let transaksi = JSON.parse(localStorage.getItem('keuangan_keluarga_ahza')) || dataDefault;
+    document.getElementById('tglInput').valueAsDate = new Date();
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        
+        if(tabName === 'jurnal') {
+            document.querySelectorAll('.nav-btn')[0].classList.add('active');
+            document.getElementById('tab-jurnal').classList.add('active');
+        } else {
+            document.querySelectorAll('.nav-btn')[1].classList.add('active');
+            document.getElementById('tab-asisten').classList.add('active');
+        }
+    }
+
+    function formatRupiah(angka) {
+        return "Rp " + Number(angka || 0).toLocaleString('id-ID');
+    }
+
+    function renderTabel() {
+        const tbody = document.getElementById('isiTabel');
+        tbody.innerHTML = "";
+        
+        let saldoBerjalan = 0;
+        let totalMasukVal = 0;
+        let totalKeluarVal = 0;
+
+        transaksi.forEach((item, index) => {
+            let m = Number(item.masuk || 0);
+            let k = Number(item.keluar || 0);
+            saldoBerjalan += (m - k);
+            totalMasukVal += m;
+            totalKeluarVal += k;
+
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.tanggal || '-'}</td>
+                <td>${item.ket || '-'}</td>
+                <td>${item.kat || '-'}</td>
+                <td class="text-right" style="color:green;">${m > 0 ? formatRupiah(m) : '-'}</td>
+                <td class="text-right" style="color:red;">${k > 0 ? formatRupiah(k) : '-'}</td>
+                <td class="text-right" style="font-weight:bold;">${formatRupiah(saldoBerjalan)}</td>
+                <td class="text-center"><button class="btn-danger" onclick="hapusBaris(${index})">Hapus</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('totalMasuk').innerText = formatRupiah(totalMasukVal);
+        document.getElementById('totalKeluar').innerText = formatRupiah(totalKeluarVal);
+        document.getElementById('sisaKas').innerText = formatRupiah(saldoBerjalan);
+
+        localStorage.setItem('keuangan_keluarga_ahza', JSON.stringify(transaksi));
+    }
+
+    function tambahTransaksiManual() {
+        const tgl = document.getElementById('tglInput').value;
+        const ket = document.getElementById('ketInput').value.trim();
+        const kat = document.getElementById('katInput').value;
+        const tipe = document.getElementById('tipeInput').value;
+        const jumlah = Number(document.getElementById('jumlahInput').value);
+
+        if (!ket || !jumlah || jumlah <= 0) {
+            alert("Mohon isi keterangan dan jumlah nominal dengan benar!");
+            return;
+        }
+
+        let masuk = tipe === 'masuk' ? jumlah : 0;
+        let keluar = tipe === 'keluar' ? jumlah : 0;
+
+        transaksi.push({tanggal: tgl, ket: ket, kat: kat, masuk: masuk, keluar: keluar});
+        
+        document.getElementById('ketInput').value = "";
+        document.getElementById('jumlahInput').value = "";
+        renderTabel();
+        alert("Transaksi berhasil ditambahkan!");
+    }
+
+    function hapusBaris(index) {
+        if(confirm("Yakin ingin menghapus transaksi ini?")) {
+            transaksi.splice(index, 1);
+            renderTabel();
+        }
+    }
+
+    function resetDataDefault() {
+        if(confirm("Kembalikan data ke data asli Excel?")) {
+            transaksi = JSON.parse(JSON.stringify(dataDefault));
+            renderTabel();
+        }
+    }
+
+    function kosongkanSemuaData() {
+        if(confirm("Peringatan: Semua riwayat transaksi akan dikosongkan. Lanjutkan?")) {
+            transaksi = [];
+            renderTabel();
+        }
+    }
+
+    function exportData() {
+        let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transaksi));
+        let downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", "keuangan_keluarga_ahza.json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    function handleChatKey(e) {
+        if (e.key === 'Enter') {
+            prosesChatAI();
+        }
+    }
+
+    function parseNominal(text) {
+        text = text.toLowerCase();
+        let match = text.match(/(\d+)\s*(rb|ribu|k)?/);
+        if (!match) return 0;
+        let num = parseInt(match[1]);
+        let unit = match[2];
+        if (unit === 'rb' || unit === 'ribu' || unit === 'k') {
+            num *= 1000;
+        } else if (num < 1000 && num > 0 && (text.includes('rb') || text.includes('ribu'))) {
+            num *= 1000;
+        }
+        return num;
+    }
+
+    function prosesChatAI() {
+        const inputField = document.getElementById('chatInput');
+        const text = inputField.value.trim();
+        if(!text) return;
+
+        const chatBox = document.getElementById('chatBox');
+        
+        let userDiv = document.createElement('div');
+        userDiv.className = 'chat-msg chat-user';
+        userDiv.innerText = text;
+        chatBox.appendChild(userDiv);
+        inputField.value = "";
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        let lower = text.toLowerCase();
+        let nominal = parseNominal(text);
+        
+        setTimeout(() => {
+            let aiDiv = document.createElement('div');
+            aiDiv.className = 'chat-msg chat-ai';
+
+            if (nominal <= 0) {
+                aiDiv.innerText = "Maaf, saya tidak mendeteksi nominal angka. Coba tulis format seperti: 'beli bensin 20rb' atau 'pemasukan 500rb'.";
+            } else {
+                let isMasuk = lower.includes('pemasukan') || lower.includes('masuk') || lower.includes('gaji') || lower.includes('bonus') || lower.includes('terima');
+                let masukVal = isMasuk ? nominal : 0;
+                let keluarVal = isMasuk ? 0 : nominal;
+                let kat = isMasuk ? 'Inflow' : 'Konsumsi / Jajan';
+                
+                let ket = text.charAt(0).toUpperCase() + text.slice(1);
+                let today = new Date().toISOString().split('T')[0];
+
+                transaksi.push({tanggal: today, ket: ket, kat: kat, masuk: masukVal, keluar: keluarVal});
+                renderTabel();
+
+                aiDiv.innerHTML = `Berhasil dicatat!<br><b>${ket}</b> sebesar <b>${formatRupiah(nominal)}</b> (${isMasuk ? 'Pemasukan' : 'Pengeluaran'}). Saldo berjalan terbarui.`;
+            }
+
+            chatBox.appendChild(aiDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }, 500);
+    }
+
+    renderTabel();
+</script>
+
+</body>
+</html>
