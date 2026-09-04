@@ -27,10 +27,10 @@
         
         <!-- Navigation Tabs -->
         <nav class="flex space-x-2 bg-slate-900 p-1 rounded-xl border border-slate-700">
-            <button onclick="switchTab('chat')" id="nav-chat" class="px-4 py-2 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow">
+            <button onclick="switchTab('chat')" id="nav-chat" class="px-4 py-2 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer">
                 <i class="fa-solid fa-comments mr-1"></i> Chat AI Assistant
             </button>
-            <button onclick="switchTab('report')" id="nav-report" class="px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white">
+            <button onclick="switchTab('report')" id="nav-report" class="px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white cursor-pointer">
                 <i class="fa-solid fa-file-invoice-dollar mr-1"></i> Laporan Keuangan Keluarga
             </button>
         </nav>
@@ -63,7 +63,7 @@
                     <input 
                         type="text" 
                         id="user-input" 
-                        placeholder="Ketik transaksi (contoh: Pemasukan 50rb dari jualan)..." 
+                        placeholder="Ketik transaksi (contoh: Pemasukan 400000)..." 
                         class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition text-sm"
                         autocomplete="off"
                         required
@@ -82,7 +82,7 @@
                     <h2 class="text-xl font-bold text-white">Laporan Posisi Keuangan Keluarga</h2>
                     <p class="text-xs text-slate-400 mt-1">Standar Akuntansi Rumah Tangga & Arus Kas Ahza Capital</p>
                 </div>
-                <button onclick="loadFinancialReport()" class="bg-slate-700 hover:bg-slate-600 text-xs text-slate-200 px-4 py-2 rounded-xl transition flex items-center gap-2 border border-slate-600">
+                <button onclick="loadFinancialReport()" class="bg-slate-700 hover:bg-slate-600 text-xs text-slate-200 px-4 py-2 rounded-xl transition flex items-center gap-2 border border-slate-600 cursor-pointer">
                     <i class="fa-solid fa-rotate-right"></i> Muat Ulang Data
                 </button>
             </div>
@@ -115,13 +115,13 @@
                             <tr class="bg-slate-900/60 text-slate-400 text-xs border-b border-slate-700 uppercase tracking-wider">
                                 <th class="py-3 px-6">Tanggal</th>
                                 <th class="py-3 px-6">Keterangan / Akun</th>
-                                <th class="py-3 px-6">Jenis</th>
+                                <th class="py-3 px-6">Tipe</th>
                                 <th class="py-3 px-6 text-right">Pemasukan (IDR)</th>
                                 <th class="py-3 px-6 text-right">Pengeluaran (IDR)</th>
                             </tr>
                         </thead>
                         <tbody id="accounting-table-body" class="divide-y divide-slate-700/50 text-slate-300">
-                            <!-- Data akan dimuat secara dinamis via JavaScript -->
+                            <!-- Data dimuat dinamis -->
                         </tbody>
                     </table>
                 </div>
@@ -130,17 +130,17 @@
 
     </main>
 
-    <!-- Script Aplikasi Lengkap -->
+    <!-- Script Aplikasi -->
     <script>
         // ==========================================
-        // KONFIGURASI SUPABASE (Sesuaikan kredensial Anda)
+        // KONFIGURASI SUPABASE (Ganti dengan kredensial Anda)
         // ==========================================
         const SUPABASE_URL = 'https://cskfciznhglcxceigvfy.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNza2ZjaXpuaGdsY3hjZWlndmZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MTYwODUsImV4cCI6MjEwNDA5MjA4NX0.4V90m6E3oB0ued2mOhaeu-IZ9IbRQ2pHXVEO43gN16o';
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Tab Switching Logic
+        // Fungsi Perpindahan Tab (Navbar)
         function switchTab(tab) {
             const chatView = document.getElementById('view-chat');
             const reportView = document.getElementById('view-report');
@@ -150,18 +150,18 @@
             if (tab === 'chat') {
                 chatView.classList.remove('hidden');
                 reportView.classList.add('hidden');
-                navChat.className = "px-4 py-2 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow";
-                navReport.className = "px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white";
+                navChat.className = "px-4 py-2 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer";
+                navReport.className = "px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white cursor-pointer";
             } else {
                 chatView.classList.add('hidden');
                 reportView.classList.remove('hidden');
-                navReport.className = "px-4 py-2 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow";
-                navChat.className = "px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white";
-                loadFinancialReport(); // Ambil data akuntansi saat tab laporan dibuka
+                navReport.className = "px-4 py-2 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer";
+                navChat.className = "px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white cursor-pointer";
+                loadFinancialReport(); // Ambil data saat tab laporan dibuka
             }
         }
 
-        // Chat UI Elements
+        // Chat UI Logic
         const chatContainer = document.getElementById('chat-container');
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
@@ -193,12 +193,11 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-        // AI Command Processor
-        // Parsing Pintar untuk Input Chat (Diperbaiki agar akurat mendeteksi pemasukan)
+        // AI Command Processor (Menyimpan dengan kolom 'tipe' sesuai Supabase Anda)
         async function processAICommand(text) {
             const lower = text.toLowerCase();
             
-            if (lower.includes('rekap') || lower.includes('saldo laporan') || lower.includes('total')) {
+            if (lower.includes('rekap') || lower.includes('saldo') || lower.includes('laporan') || lower.includes('total')) {
                 return await fetchAndShowSummary();
             }
 
@@ -210,8 +209,8 @@
             let rawNum = numberMatch[0].replace(/\./g, '').replace(/,/g, '');
             let amount = parseFloat(rawNum);
 
-            // LOGIKA DIPERBAIKI: Deteksi eksplisit untuk Pemasukan / Saldo Awal / Terima
-            let type = 'keluar'; // default
+            // Deteksi jenis transaksi (Pemasukan / Pengeluaran)
+            let type = 'Pengeluaran';
             if (
                 lower.includes('masuk') || 
                 lower.includes('pemasukan') || 
@@ -221,17 +220,18 @@
                 lower.includes('saldo awal') ||
                 lower.includes('uang sebelumnya')
             ) {
-                type = 'masuk';
+                type = 'Pemasukan';
             }
 
             let description = text.replace(numberMatch[0], '').replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp/gi, '').trim();
-            if (!description) description = type === 'masuk' ? 'Pemasukan Tunai' : 'Pengeluaran Tunai';
+            if (!description) description = type === 'Pemasukan' ? 'Pemasukan Tunai' : 'Pengeluaran Tunai';
 
+            // Menyimpan ke tabel 'transaksi' dengan kolom 'tipe' (Huruf kapital)
             const { data, error } = await supabaseClient
                 .from('transaksi')
                 .insert([
                     { 
-                        jenis: type, 
+                        tipe: type, 
                         jumlah: amount, 
                         keterangan: description, 
                         tanggal: new Date().toISOString().split('T')[0] 
@@ -244,13 +244,14 @@
             }
 
             const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
-            let badgeColor = type === 'masuk' ? 'text-emerald-400' : 'text-rose-400';
+            let badgeColor = type === 'Pemasukan' ? 'text-emerald-400' : 'text-rose-400';
             
             return `✅ Berhasil dicatat ke Jurnal Keuangan!<br>
-                • Jenis: <span class="${badgeColor} font-bold">${type.toUpperCase()}</span><br>
+                • Tipe: <span class="${badgeColor} font-bold">${type.toUpperCase()}</span><br>
                 • Jumlah: <b>${formatIDR(amount)}</b><br>
                 • Keterangan: ${description}`;
         }
+
         async function fetchAndShowSummary() {
             const { data, error } = await supabaseClient.from('transaksi').select('*');
             if (error) return "Gagal mengambil data dari database.";
@@ -260,7 +261,8 @@
 
             data.forEach(row => {
                 let jml = parseFloat(row.jumlah) || 0;
-                if (row.jenis && row.jenis.toLowerCase() === 'masuk') {
+                let tipeVal = row.tipe ? row.tipe.toLowerCase() : '';
+                if (tipeVal.includes('masuk')) {
                     totalMasuk += jml;
                 } else {
                     totalKeluar += jml;
@@ -277,10 +279,10 @@
                 <span class="text-xs text-slate-400">Total ${data.length} transaksi tercatat. Buka menu 'Laporan Keuangan Keluarga' untuk rincian akuntansi standar.</span>`;
         }
 
-        // Load Financial Accounting Report Table (Sudah Diperbaiki & Aman dari Error)
+        // Load Financial Accounting Report Table
         async function loadFinancialReport() {
             const tbody = document.getElementById('accounting-table-body');
-            if (!tbody) return; // Mencegah error jika elemen belum siap
+            if (!tbody) return;
             
             tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat data akuntansi...</td></tr>`;
 
@@ -308,7 +310,6 @@
 
             data.forEach(row => {
                 let jml = parseFloat(row.jumlah) || 0;
-                
                 let tipeVal = row.tipe ? row.tipe.toLowerCase() : '';
                 let isMasuk = tipeVal.includes('masuk');
                 
@@ -336,7 +337,6 @@
             document.getElementById('rep-total-keluar').innerText = formatIDR(totalKeluar);
             document.getElementById('rep-net-saldo').innerText = formatIDR(saldoBersih);
             
-            // PERBAIKAN TYPO DI SINI:
             const saldoEl = document.getElementById('rep-net-saldo');
             if (saldoEl) {
                 saldoEl.className = `text-2xl font-bold mt-2 ${saldoBersih >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
@@ -347,42 +347,8 @@
                 countEl.innerText = `${data.length} Transaksi Tercatat`;
             }
         }
-            const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
 
-            data.forEach(row => {
-                let jml = parseFloat(row.jumlah) || 0;
-                
-                // MENGGUNAKAN KOLOM 'tipe' SESUAI SUPABASE ANDA
-                let tipeVal = row.tipe ? row.tipe.toLowerCase() : '';
-                let isMasuk = tipeVal.includes('masuk');
-                
-                if (isMasuk) totalMasuk += jml;
-                else totalKeluar += jml;
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-700/30 transition";
-                tr.innerHTML = `
-                    <td class="py-3 px-6 text-xs text-slate-400">${row.tanggal || '-'}</td>
-                    <td class="py-3 px-6 font-medium text-white">${escapeHtml(row.keterangan || row.kategori || '-')}</td>
-                    <td class="py-3 px-6">
-                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${isMasuk ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
-                            ${row.tipe ? row.tipe.toUpperCase() : (isMasuk ? 'PEMASUKAN' : 'PENGELUARAN')}
-                        </span>
-                    </td>
-                    <td class="py-3 px-6 text-right font-semibold ${isMasuk ? 'text-emerald-400' : 'text-slate-600'}">${isMasuk ? formatIDR(jml) : '-'}</td>
-                    <td class="py-3 px-6 text-right font-semibold ${!isMasuk ? 'text-rose-400' : 'text-slate-600'}">${!isMasuk ? formatIDR(jml) : '-'}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            let saldoBersih = totalMasuk - totalKeluar;
-            document.getElementById('rep-total-masuk').innerText = formatIDR(totalMasuk);
-            document.getElementById('rep-total-keluar').innerText = formatIDR(totalKeluar);
-            document.getElementById('rep-net-saldo').innerText = formatIDR(saldoBersih);
-            document.getElementById('rep-net-saldoclassName = `text-2xl font-bold mt-2 ${saldoBersih >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
-            document.getElementById('rep-count').innerText = `${data.length} Transaksi Tercatat`;
-        }
-        // Event Listener Chat Submit
+        // Chat Form Submit Handler
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = userInput.value.trim();
