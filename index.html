@@ -193,7 +193,7 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-        // AI Command Processor (Auto Tipe & Auto Kategori)
+        // AI Command Processor (Tanggal disesuaikan dengan waktu lokal HP/Laptop)
         async function processAICommand(text) {
             const lower = text.toLowerCase();
             
@@ -240,7 +240,14 @@
             let description = text.replace(numberMatch[0], '').replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp/gi, '').trim();
             if (!description) description = text;
 
-            // Simpan ke Supabase
+            // PERBAIKAN TANGGAL: Menggunakan tanggal lokal perangkat (format YYYY-MM-DD)
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const localDate = `${year}-${month}-${day}`;
+
+            // Simpan ke Supabase dengan tanggal lokal yang akurat
             const { data, error } = await supabaseClient
                 .from('transaksi')
                 .insert([
@@ -249,25 +256,24 @@
                         kategori: category,
                         keterangan: description, 
                         jumlah: amount, 
-                        tanggal: new Date().toISOString().split('T')[0] 
+                        tanggal: localDate 
                     }
                 ]);
 
             if (error) {
-                console.h(error);
+                console.error(error);
                 return `❌ Gagal menyimpan ke database Supabase: ${error.message}`;
             }
 
             const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
             let badgeColor = type === 'Pemasukan' ? 'text-emerald-400' : 'text-rose-400';
             
-            return `✅ Tercatat Otomatis!<br>
+            return `✅ Tercatat Otomatis (${localDate})!<br>
                 • Tipe: <span class="${badgeColor} font-bold">${type.toUpperCase()}</span><br>
                 • Kategori: <b>${category}</b><br>
                 • Jumlah: <b>${formatIDR(amount)}</b><br>
                 • Keterangan: ${description}`;
         }
-
         async function fetchAndShowSummary() {
             const { data, error } = await supabaseClient.from('transaksi').select('*');
             if (error) return "Gagal mengambil data dari database.";
