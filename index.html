@@ -193,21 +193,13 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-        // AI Command Processor (Tanggal disesuaikan dengan waktu lokal HP/Laptop)
+        // AI Command Processor (Pintar Membaca Satuan Berat/Jumlah & Harga)
         async function processAICommand(text) {
             const lower = text.toLowerCase();
             
             if (lower.includes('rekap') || lower.includes('saldo') || lower.includes('laporan') || lower.includes('total')) {
                 return await fetchAndShowSummary();
             }
-
-            const numberMatch = text.match(/(\d[\d\.,]*)/);
-            if (!numberMatch) {
-                return "Maaf, format belum dikenali. Cukup ketik: <b>'beli bawang merah 6000'</b> atau <b>'pemasukan gaji 5000000'</b>.";
-            }
-
-            let rawNum = numberMatch[0].replace(/\./g, '').replace(/,/g, '');
-            let amount = parseFloat(rawNum);
 
             // Deteksi Tipe Otomatis
             let type = 'Pengeluaran';
@@ -225,7 +217,7 @@
 
             // Deteksi Kategori Otomatis
             let category = 'Umum';
-            if (lower.includes('makan') || lower.includes('beli') || lower.includes('bawang') || lower.includes('sayur') || lower.includes('beras') || lower.includes('dapur') || lower.includes('minum')) {
+            if (lower.includes('makan') || lower.includes('beli') || lower.includes('ayam') || lower.includes('bawang') || lower.includes('sayur') || lower.includes('beras') || lower.includes('dapur') || lower.includes('minum')) {
                 category = 'Konsumsi & Dapur';
             } else if (lower.includes('bensin') || lower.includes('transport') || lower.includes('parkir') || lower.includes('gojek') || lower.includes('grab')) {
                 category = 'Transportasi';
@@ -237,24 +229,49 @@
                 category = 'Inflow / Pendapatan';
             }
 
-            let description = text.replace(numberMatch[0], '').replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp/gi, '').trim();
-            if (!description) description = text;
+            let amount = 0;
+            let cleanDescription = text;
 
-            // PERBAIKAN TANGGAL: Menggunakan tanggal lokal perangkat (format YYYY-MM-DD)
+            // 1. Pola Khusus: Angka + Satuan (Contoh: "2kg", "1.5 kg", "500 gr", "2 liter", "3 pcs")
+            // Pola ini akan mengabaikan angka satuan berat agar tidak keliru dianggap harga uang
+            const textWithoutUnits = text.replace(/(\d+[\.,]?\d*)\s*(kg|gr|gram|ltr|liter|ml|pcs|buah|bks|bungkus|pack|porsi)/gi, (match) => {
+                return ''; // Hapus sementara teks satuan dari deteksi harga nominal utama
+            });
+
+            // 2. Ambil angka yang tersisa setelah satuan dibersihkan
+            const remainingNumbers = textWithoutUnits.match(/(\d[\d\.,]*)/g);
+
+            if (remainingNumbers && remainingNumbers.length > 0) {
+                // Ubah semua angka sisa menjadi float
+                let parsedNumbers = remainingNumbers.map(n => parseFloat(n.replace(/\./g, '').replace(/,/g, '')));
+                
+                // Ambil angka terbesar yang murni sebagai harga uang
+                amount = Math.max(...parsedNumbers);
+            } else {
+                // Fallback jika semua angka terdeteksi sebagai satuan
+                const fallbackNumbers = text.match(/(\d[\d\.,]*)/g);
+                amount = fallbackNumbers ? parseFloat(fallbackNumbers[fallbackNumbers.length - 1].replace(/\./g, '').replace(/,/g, '')) : 0;
+            }
+
+            if (amount === 0) {
+                return "Maaf, nominal harga belum terdeteksi dengan jelas. Cukup ketik: <b>'beli ayam 2kg 87000'</b>.";
+            }
+
+            // Keterangan bersih dari kata kunci tipe/nominal
+            cleanDescription = text.replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp/gi, '').trim();
+
+            // Tanggal lokal perangkat
             const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const localDate = `${year}-${month}-${day}`;
+            const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-            // Simpan ke Supabase dengan tanggal lokal yang akurat
+            // Simpan ke Supabase
             const { data, error } = await supabaseClient
                 .from('transaksi')
                 .insert([
                     { 
                         tipe: type, 
                         kategori: category,
-                        keterangan: description, 
+                        keterangan: cleanDescription, 
                         jumlah: amount, 
                         tanggal: localDate 
                     }
@@ -272,7 +289,7 @@
                 • Tipe: <span class="${badgeColor} font-bold">${type.toUpperCase()}</span><br>
                 • Kategori: <b>${category}</b><br>
                 • Jumlah: <b>${formatIDR(amount)}</b><br>
-                • Keterangan: ${description}`;
+                • Keterangan: ${cleanDescription}`;
         }
         async function fetchAndShowSummary() {
             const { data, error } = await supabaseClient.from('transaksi').select('*');
