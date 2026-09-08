@@ -43,8 +43,8 @@
                         <p class="font-semibold text-emerald-400 mb-1">Halo Mind Master!</p>
                         <p class="text-slate-300">Ketik apa saja secara natural tanpa format kaku. Contoh:</p>
                         <ul class="list-disc list-inside mt-1.5 space-y-1 text-slate-400">
-                            <li><i>"saldo di rekening bjb 503099"</i></li>
-                            <li><i>"transfer dari bsi ke bsa 150rb untuk spp teteh"</i></li>
+                            <li><i>"saldo di rekening bjb sekarang 503099"</i></li>
+                            <li><i>"transfer dari bsi ke bjb 150rb"</i></li>
                             <li><i>"omset nadirasa 500rb masuk bjb"</i></li>
                             <li><i>"rekap keuangan"</i></li>
                         </ul>
@@ -231,13 +231,7 @@
         async function processAICommand(text) {
             const lower = text.toLowerCase();
             
-            // Cek apakah murni minta rekap/laporan (tanpa menyebut angka saldo spesifik)
-            const isPureReportRequest = (lower.includes('rekap') || lower.includes('laporan keuangan') || lower.includes('total keseluruhan')) && !/\d/.test(lower);
-            if (isPureReportRequest) {
-                return await fetchAndShowSummary();
-            }
-
-            // Ekstrak angka dari teks
+            // 1. Ekstrak angka terlebih dahulu untuk mendeteksi apakah ada nominal
             let amount = 0;
             const textWithoutUnits = text.replace(/(\d+[\.,]?\d*)\s*(kg|gr|gram|ltr|liter|ml|pcs|buah|bks|bungkus|pack|porsi)/gi, '');
             const remainingNumbers = textWithoutUnits.match(/(\d[\d\.,]*)/g);
@@ -250,10 +244,10 @@
             let accounts = detectAccounts(lower);
             let primaryAccount = accounts.length > 0 ? accounts[0] : 'Cash';
 
-            // Deteksi jika user bilang "saldo di rekening bjb 503099" -> Ini artinya penyesuaian saldo (Adjustment)
-            const isBalanceAdjustment = lower.includes('saldo di rekening') || lower.includes('saldo rekening') || (lower.includes('saldo') && accounts.length > 0 && amount > 0);
+            // 2. PRIORITAS UTAMA: Deteksi penyesuaian saldo (misal: "saldo di rekening bjb 503099")
+            const isBalanceAdjustment = lower.includes('saldo') && accounts.length > 0 && amount > 0;
 
-            if (isBalanceAdjustment && accounts.length > 0 && amount > 0) {
+            if (isBalanceAdjustment) {
                 // Hitung saldo saat ini di akun tersebut via database
                 const { data: allTx } = await supabaseClient.from('transaksi').select('*');
                 let currentAccBalance = 0;
@@ -291,6 +285,12 @@
                 return `✅ <b>Saldo ${primaryAccount} Berhasil Diset! (${localDate})</b><br>
                     • Saldo Baru: <b class="text-emerald-400">${formatIDR(amount)}</b><br>
                     • Penyesuaian otomatis tercatat: <span class="${adjType === 'Pemasukan' ? 'text-emerald-400' : 'text-rose-400'}">${adjType} ${formatIDR(adjAmount)}</span>`;
+            }
+
+            // 3. Cek apakah murni minta rekap/laporan (hanya jika TIDAK ada angka sama sekali)
+            const isPureReportRequest = (lower.includes('rekap') || lower.includes('laporan keuangan') || lower.includes('total keseluruhan') || lower === 'saldo' || lower === 'laporan') && amount === 0;
+            if (isPureReportRequest) {
+                return await fetchAndShowSummary();
             }
 
             if (amount === 0) {
