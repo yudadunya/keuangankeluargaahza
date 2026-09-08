@@ -2,225 +2,648 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatUang - Cukup chat, langsung tercatat.</title>
-    <!-- Tailwind CSS CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChatRekap - Cukup chat, langsung tercatat.</title>
+    <!-- Tailwind CSS v3 (Stabil CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS CDN -->
+    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- FontAwesome untuk ikon -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 flex flex-col h-screen max-w-md mx-auto relative shadow-2xl border-x border-slate-200">
+<body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
-    <!-- HEADER -->
-    <header class="bg-white border-b border-slate-100 py-3 px-4 flex items-center justify-between z-10">
+    <!-- Mobile Header dengan Logo & Tagline -->
+    <header class="bg-slate-800 border-b border-slate-700 px-4 py-2.5 flex justify-between items-center shadow-md z-20 flex-shrink-0">
         <div class="flex items-center space-x-3">
-            <!-- Logo ChatUang Baru -->
-            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-teal-600 to-emerald-400 flex items-center justify-center text-white shadow-md">
-                <i class="fa-solid fa-comment-dollar text-lg"></i>
+            <!-- Logo Gambar Kustom -->
+            <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 border border-slate-700 flex items-center justify-center flex-shrink-0 shadow">
+                <img src="image_4cb225a3.jpg" alt="ChatRekap Logo" class="w-full h-full object-cover">
             </div>
             <div>
-                <h1 class="font-bold text-lg text-slate-900 leading-none">ChatUang</h1>
-                <p class="text-xs text-slate-500 mt-1">Cukup chat, langsung tercatat.</p>
+                <h1 class="font-bold text-sm text-white tracking-wide flex items-center gap-1.5">
+                    CHAT<span class="text-emerald-400">REKAP</span>
+                </h1>
+                <p class="text-[10px] text-slate-400 italic">Cukup chat, langsung tercatat.</p>
             </div>
         </div>
-        <div class="flex items-center space-x-2">
-            <button onclick="toggleAccountsModal()" class="bg-teal-50 text-teal-700 p-2 rounded-full hover:bg-teal-100 transition">
-                <i class="fa-solid fa-wallet text-sm"></i>
-            </button>
-        </div>
+        
+        <button onclick="loadFinancialReport()" class="bg-slate-700/60 hover:bg-slate-700 text-xs text-slate-300 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 border border-slate-600 active:scale-95 cursor-pointer">
+            <i class="fa-solid fa-rotate-right text-[10px]"></i> <span class="hidden sm:inline">Refresh</span>
+        </button>
     </header>
 
-    <!-- MAIN CONTAINER (TABS) -->
-    <main class="flex-1 overflow-hidden relative pb-16">
-        <!-- TAB 1: CHAT AI -->
-        <div id="tab-chat" class="absolute inset-0 flex flex-col bg-slate-50">
-            <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4">
-                <!-- Sambutan AI -->
-                <div class="flex items-start space-x-2">
-                    <div class="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 shadow">
-                        <i class="fa-solid fa-robot text-xs"></i>
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-hidden flex flex-col relative pb-20">
+
+        <!-- VIEW 1: CHAT AI -->
+        <section id="view-chat" class="flex-1 flex flex-col h-full overflow-hidden">
+            <div class="flex-1 overflow-y-auto p-3 md:p-6 space-y-3 max-w-4xl w-full mx-auto" id="chat-container">
+                <!-- Pesan Sambutan Bot -->
+                <div class="flex items-start space-x-2.5">
+                    <div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700">
+                        <img src="image_4cb225a3.jpg" alt="AI" class="w-full h-full object-cover">
                     </div>
-                    <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm border border-slate-100 text-sm max-w-[80%]">
-                        <p class="font-semibold text-teal-800 mb-1">Halo!</p>
-                        <p>Saya asisten keuangan <strong>ChatUang</strong> Anda. Ketik transaksi secara natural, contoh:</p>
-                        <p class="text-xs bg-slate-100 p-2 rounded mt-2 text-slate-600 font-mono">"makan siang bca 35rb"<br>"transfer dari bca ke bsi 500rb"</p>
+                    <div class="bg-slate-800 border border-slate-700 p-3.5 rounded-2xl rounded-tl-none max-w-[88%] md:max-w-xl text-xs md:text-sm leading-relaxed shadow">
+                        <p class="font-semibold text-emerald-400 mb-1">Halo Mind Master!</p>
+                        <p class="text-slate-300">Selamat datang di <b>ChatRekap</b>. Cukup chat, langsung tercatat. Contoh perintah:</p>
+                        <ul class="list-disc list-inside mt-1.5 space-y-1 text-slate-400">
+                            <li><i>"saldo di rekening bjb sekarang 503099"</i></li>
+                            <li><i>"transfer dari bsi ke bjb 150rb"</i></li>
+                            <li><i>"omset nadirasa 500rb masuk bjb"</i></li>
+                            <li><i>"rekap keuangan"</i></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-
-            <!-- Input Chat -->
-            <div class="p-3 bg-white border-t border-slate-100">
-                <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex items-center space-x-2">
-                    <input type="text" id="chat-input" placeholder="Ketik transaksi Anda..." autocomplete="off"
-                        class="flex-1 bg-slate-100 border-none rounded-full px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    <button type="submit" class="bg-teal-600 text-white w-11 h-11 rounded-full flex items-center justify-center hover:bg-teal-700 transition shadow">
+            
+            <!-- Chat Input Footer -->
+            <footer class="bg-slate-800/95 backdrop-blur border-t border-slate-700 p-2.5 md:p-4 shadow-lg flex-shrink-0">
+                <form id="chat-form" class="max-w-4xl mx-auto flex gap-2">
+                    <input 
+                        type="text" 
+                        id="user-input" 
+                        placeholder="Ketik bebas seperti ngobrol..." 
+                        class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition text-xs md:text-sm"
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-900 font-semibold px-4 py-2.5 rounded-xl transition flex items-center justify-center shadow-lg cursor-pointer">
                         <i class="fa-solid fa-paper-plane text-sm"></i>
                     </button>
                 </form>
-            </div>
-        </div>
+            </footer>
+        </section>
 
-        <!-- TAB 2: LAPORAN / JURNAL -->
-        <div id="tab-reports" class="absolute inset-0 hidden flex flex-col bg-slate-50 overflow-y-auto p-4 space-y-4">
-            <div class="bg-gradient-to-r from-teal-600 to-emerald-500 text-white p-4 rounded-2xl shadow-lg">
-                <p class="text-xs opacity-80 uppercase tracking-wider font-semibold">Total Kekayaan Bersih</p>
-                <h2 id="total-balance-text" class="text-2xl font-bold mt-1">Rp 0</h2>
-            </div>
+        <!-- VIEW 2: LAPORAN KEUANGAN KELUARGA & AKUN -->
+        <section id="view-report" class="flex-1 overflow-y-auto p-3 md:p-8 space-y-4 max-w-6xl w-full mx-auto hidden">
             
-            <div class="flex justify-between items-center">
-                <h3 class="font-bold text-slate-800">Riwayat Transaksi</h3>
-                <button onclick="loadTransactions()" class="text-teal-600 text-xs font-semibold hover:underline">
-                    <i class="fa-solid fa-rotate-right mr-1"></i> Muat Ulang
-                </button>
+            <!-- Ringkasan Global -->
+            <div class="grid grid-cols-3 gap-2 md:gap-4">
+                <div class="bg-slate-800 p-3 md:p-5 rounded-xl md:rounded-2xl border border-slate-700 shadow">
+                    <p class="text-[10px] md:text-xs font-medium text-slate-400 uppercase tracking-wider">Pemasukan</p>
+                    <p id="rep-total-masuk" class="text-sm md:text-2xl font-bold text-emerald-400 mt-1 truncate">Rp 0</p>
+                </div>
+                <div class="bg-slate-800 p-3 md:p-5 rounded-xl md:rounded-2xl border border-slate-700 shadow">
+                    <p class="text-[10px] md:text-xs font-medium text-slate-400 uppercase tracking-wider">Pengeluaran</p>
+                    <p id="rep-total-keluar" class="text-sm md:text-2xl font-bold text-rose-400 mt-1 truncate">Rp 0</p>
+                </div>
+                <div class="bg-slate-800 p-3 md:p-5 rounded-xl md:rounded-2xl border border-slate-700 shadow">
+                    <p class="text-[10px] md:text-xs font-medium text-slate-400 uppercase tracking-wider">Total Kekayaan</p>
+                    <p id="rep-net-saldo" class="text-sm md:text-2xl font-bold text-white mt-1 truncate">Rp 0</p>
+                </div>
             </div>
 
-            <div id="transactions-list" class="space-y-2 pb-6">
-                <!-- Data transaksi akan dimuat secara dinamis di sini -->
-                <p class="text-center text-xs text-slate-400 py-6">Memuat data transaksi...</p>
+            <!-- Ringkasan Saldo Per Akun / Bank -->
+            <div class="bg-slate-800 rounded-xl md:rounded-2xl border border-slate-700 p-4 shadow">
+                <h3 class="font-bold text-xs md:text-sm text-slate-200 mb-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-wallet mr-1.5 text-emerald-400"></i> Rincian Saldo Per Rekening & Bank</span>
+                    <span class="text-[10px] text-slate-400 font-normal">ChatRekap Multi-Account</span>
+                </h3>
+                <div id="accounts-summary-list" class="divide-y divide-slate-700/60">
+                    <!-- Data dimuat dinamis -->
+                </div>
             </div>
-        </div>
+
+            <!-- Standard Accounting Table Card -->
+            <div class="bg-slate-800 rounded-xl md:rounded-2xl border border-slate-700 shadow-lg overflow-hidden flex flex-col mb-4">
+                <div class="px-4 md:px-6 py-3 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+                    <h3 class="font-bold text-xs md:text-sm text-slate-200"><i class="fa-solid fa-book-journal-whills mr-1.5 text-emerald-400"></i> Jurnal Transaksi</h3>
+                    <span id="rep-count" class="text-[10px] md:text-xs bg-slate-700 text-slate-300 px-2.5 py-0.5 rounded-full">0 Transaksi</span>
+                </div>
+                <div class="overflow-x-auto max-h-[40vh] md:max-h-none">
+                    <table class="w-full text-left text-xs md:text-sm border-collapse whitespace-nowrap md:whitespace-normal">
+                        <thead>
+                            <tr class="bg-slate-900/60 text-slate-400 text-[10px] md:text-xs border-b border-slate-700 uppercase tracking-wider sticky top-0">
+                                <th class="py-2.5 px-3 md:px-6">Tanggal</th>
+                                <th class="py-2.5 px-3 md:px-6">Keterangan</th>
+                                <th class="py-2.5 px-3 md:px-6">Akun / Bank</th>
+                                <th class="py-2.5 px-3 md:px-6">Tipe</th>
+                                <th class="py-2.5 px-3 md:px-6 text-right">Pemasukan</th>
+                                <th class="py-2.5 px-3 md:px-6 text-right">Pengeluaran</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accounting-table-body" class="divide-y divide-slate-700/50 text-slate-300">
+                            <!-- Data dimuat dinamis -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <!-- BOTTOM NAVIGATION -->
-    <nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around py-2 z-20">
-        <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center text-teal-600 transition">
-            <i class="fa-solid fa-comments text-lg"></i>
-            <span class="text-[10px] font-medium mt-1">Chat AI</span>
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-6 py-2.5 flex justify-around items-center shadow-[0_-4px_15px_rgba(0,0,0,0.3)] z-50">
+        <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center py-1 px-6 rounded-xl text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer">
+            <i class="fa-solid fa-comments text-base"></i>
+            <span class="text-[10px] mt-0.5">Chat AI</span>
         </button>
-        <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center text-slate-400 hover:text-slate-600 transition">
-            <i class="fa-solid fa-wallet text-lg"></i>
-            <span class="text-[10px] font-medium mt-1">Dompet & Jurnal</span>
+        <button onclick="switchTab('report')" id="nav-report" class="flex flex-col items-center py-1 px-6 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white cursor-pointer">
+            <i class="fa-solid fa-file-invoice-dollar text-base"></i>
+            <span class="text-[10px] mt-0.5">Laporan</span>
         </button>
     </nav>
 
-    <!-- MODAL AKUN / DOMPET -->
-    <div id="accounts-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 max-h-[80vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-lg text-slate-900">Daftar Rekening & Dompet</h3>
-                <button onclick="toggleAccountsModal()" class="text-slate-400 hover:text-slate-600 p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <div id="accounts-list" class="space-y-3">
-                <!-- Daftar akun dimuat dinamis -->
-            </div>
-        </div>
-    </div>
-
-    <!-- SCRIPT UTAMA -->
+    <!-- Script Aplikasi -->
     <script>
-        // KONFIGURASI SUPABASE (Ganti dengan kredensial Anda)
-        const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const SUPABASE_URL = 'https://cskfciznhglcxceigvfy.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNza2ZjaXpuaGdsY3hjZWlndmZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MTYwODUsImV4cCI6MjEwNDA5MjA4NX0.4V90m6E3oB0ued2mOhaeu-IZ9IbRQ2pHXVEO43gN16o';
+        
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let currentActiveTab = 'chat';
-
         function switchTab(tab) {
-            currentActiveTab = tab;
-            const chatTab = document.getElementById('tab-chat');
-            const reportsTab = document.getElementById('tab-reports');
+            const chatView = document.getElementById('view-chat');
+            const reportView = document.getElementById('view-report');
             const navChat = document.getElementById('nav-chat');
-            const navReports = document.getElementById('nav-reports');
+            const navReport = document.getElementById('nav-report');
+
+            const activeClass = "flex flex-col items-center py-1 px-6 rounded-xl text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer";
+            const inactiveClass = "flex flex-col items-center py-1 px-6 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white cursor-pointer";
 
             if (tab === 'chat') {
-                chatTab.classList.remove('hidden');
-                reportsTab.classList.add('hidden');
-                navChat.className = "flex flex-col items-center text-teal-600 transition";
-                navReports.className = "flex flex-col items-center text-slate-400 hover:text-slate-600 transition";
+                chatView.classList.remove('hidden');
+                reportView.classList.add('hidden');
+                navChat.className = activeClass;
+                navReport.className = inactiveClass;
             } else {
-                chatTab.classList.add('hidden');
-                reportsTab.classList.remove('hidden');
-                navReports.className = "flex flex-col items-center text-teal-600 transition";
-                navChat.className = "flex flex-col items-center text-slate-400 hover:text-slate-600 transition";
-                loadDashboardData();
+                chatView.classList.add('hidden');
+                reportView.classList.remove('hidden');
+                navReport.className = activeClass;
+                navChat.className = inactiveClass;
+                loadFinancialReport();
             }
         }
 
-        function toggleAccountsModal() {
-            const modal = document.getElementById('accounts-modal');
-            modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) {
-                loadAccountsData();
-            }
-        }
+        const chatContainer = document.getElementById('chat-container');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
 
-        async function handleChatSubmit(e) {
-            e.preventDefault();
-            const inputEl = document.getElementById('chat-input');
-            const text = inputEl.value.trim();
-            if (!text) return;
-
-            appendMessage(text, 'user');
-            inputEl.value = '';
-
-            // Simulasi pemrosesan AI ChatUang
-            setTimeout(() => {
-                appendMessage(`Baik, transaksi "${text}" berhasil diproses dan dicatat ke sistem ChatUang.`, 'ai');
-            }, 500);
-        }
-
-        function appendMessage(text, sender) {
-            const container = document.getElementById('chat-container');
+        function appendMessage(sender, text, isHtml = false) {
             const isUser = sender === 'user';
-            
-            const bubbleHTML = `
-                <div class="flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}">
-                    <div class="w-8 h-8 rounded-full ${isUser ? 'bg-slate-800' : 'bg-teal-600'} text-white flex items-center justify-center shrink-0 shadow text-xs">
-                        <i class="fa-solid ${isUser ? 'fa-user' : 'fa-robot'}"></i>
-                    </div>
-                    <div class="${isUser ? 'bg-teal-600 text-white rounded-tr-none' : 'bg-white text-slate-800 border border-slate-100 rounded-tl-none'} p-3.5 rounded-2xl shadow-sm text-sm max-w-[80%]">
-                        <p>${text}</p>
-                    </div>
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex items-start space-x-2.5 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+
+            let avatarHtml = isUser 
+                ? `<div class="bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">U</div>`
+                : `<div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700"><img src="image_4cb225a3.jpg" alt="AI" class="w-full h-full object-cover"></div>`;
+
+            let bubbleBg = isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-100 rounded-tl-none';
+
+            wrapper.innerHTML = `
+                ${avatarHtml}
+                <div class="${bubbleBg} p-3.5 rounded-2xl max-w-[85%] md:max-w-xl text-xs md:text-sm leading-relaxed shadow">
+                    ${isHtml ? text : escapeHtml(text)}
                 </div>
             `;
-            container.insertAdjacentHTML('beforeend', bubbleHTML);
-            container.scrollTop = container.scrollHeight;
+
+            chatContainer.appendChild(wrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        async function loadTransactions() {
-            const listEl = document.getElementById('transactions-list');
-            listEl.innerHTML = '<p class="text-center text-xs text-slate-400 py-4">Memuat data...</p>';
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // ====================== HELPER FUNCTIONS ======================
+
+        function parseAmount(text) {
+            const lower = text.toLowerCase();
             
-            // Contoh data statis/placeholder jika tabel belum diisi
-            setTimeout(() => {
-                listEl.innerHTML = `
-                    <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex justify-between items-center">
-                        <div>
-                            <p class="font-semibold text-sm text-slate-800">Makan Siang</p>
-                            <p class="text-xs text-slate-400">BCA • Hari ini</p>
-                        </div>
-                        <span class="text-rose-600 font-bold text-sm">-Rp 35.000</span>
+            const unitRegex = /(\d{1,3}(?:[.,]\d{3})*|\d+)([.,]\d+)?\s*(rb|ribu|k|jt|juta|j)\b/gi;
+            let match;
+            let candidates = [];
+
+            while ((match = unitRegex.exec(lower)) !== null) {
+                let numStr = match[1].replace(/\./g, '').replace(/,/g, '');
+                let decimal = match[2] ? match[2].replace(',', '.') : '';
+                let num = parseFloat(numStr + decimal);
+                
+                const unit = match[3].toLowerCase();
+                if (['rb', 'ribu', 'k'].includes(unit)) num *= 1000;
+                if (['jt', 'juta', 'j'].includes(unit)) num *= 1000000;
+                
+                candidates.push(num);
+            }
+
+            if (candidates.length > 0) {
+                return Math.max(...candidates);
+            }
+
+            const numberRegex = /(\d{1,3}(?:[.,]\d{3})+|\d{4,})/g;
+            const numbers = [];
+            let m;
+            while ((m = numberRegex.exec(text)) !== null) {
+                let n = parseFloat(m[1].replace(/\./g, '').replace(/,/g, ''));
+                if (n >= 1000) numbers.push(n);
+            }
+
+            if (numbers.length > 0) return Math.max(...numbers);
+
+            const smallNumbers = text.match(/\b(\d+)\b/g);
+            if (smallNumbers) {
+                const parsed = smallNumbers.map(n => parseFloat(n)).filter(n => n >= 100);
+                if (parsed.length > 0) return Math.max(...parsed);
+            }
+
+            return 0;
+        }
+
+        function detectAccounts(textLower) {
+            const keywords = [
+                { key: 'bca syariah', name: 'BCA Syariah' },
+                { key: 'bca-syariah', name: 'BCA Syariah' },
+                { key: 'bsi', name: 'BSI' },
+                { key: 'bjb', name: 'BJB' },
+                { key: 'seabank', name: 'Seabank' },
+                { key: 'ajaib', name: 'Ajaib' },
+                { key: 'bca', name: 'BCA' },
+                { key: 'mandiri', name: 'Mandiri' },
+                { key: 'bri', name: 'BRI' },
+                { key: 'bni', name: 'BNI' },
+                { key: 'gopay', name: 'GoPay' },
+                { key: 'ovo', name: 'OVO' },
+                { key: 'shopeepay', name: 'ShopeePay' },
+                { key: 'dana', name: 'Dana' },
+                { key: 'dompet', name: 'Cash' },
+                { key: 'tunai', name: 'Cash' },
+                { key: 'cash', name: 'Cash' }
+            ];
+
+            let found = [];
+            keywords.forEach(item => {
+                if (textLower.includes(item.key) && !found.includes(item.name)) {
+                    found.push(item.name);
+                }
+            });
+            return found;
+        }
+
+        function detectDate(textLower) {
+            const now = new Date();
+            let date = new Date(now);
+
+            if (textLower.includes('kemarin')) {
+                date.setDate(date.getDate() - 1);
+            } else if (textLower.includes('lusa')) {
+                date.setDate(date.getDate() + 2);
+            } else if (textLower.includes('besok')) {
+                date.setDate(date.getDate() + 1);
+            } else {
+                const tglMatch = textLower.match(/(?:tanggal|tgl|tgl\.)\s*(\d{1,2})/);
+                if (tglMatch) {
+                    const day = parseInt(tglMatch[1]);
+                    if (day >= 1 && day <= 31) {
+                        date.setDate(day);
+                    }
+                }
+            }
+
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function detectCategory(lower, type) {
+            if (lower.match(/makan|beli|ayam|bawang|sayur|beras|dapur|minum|nutrijel|gula|susu|tahu|tempe|lauk|nasi|goreng|bakso|mie|kopi|teh/)) {
+                return 'Konsumsi & Dapur';
+            }
+            if (lower.match(/bensin|transport|parkir|gojek|grab|ojek|tol|angkot/)) {
+                return 'Transportasi';
+            }
+            if (lower.match(/spp|sekolah|buku|kursus|les|uang saku anak/)) {
+                return 'Pendidikan Anak';
+            }
+            if (lower.match(/listrik|air|wifi|pulsa|token|internet|tagihan/)) {
+                return 'Utilitas & Tagihan';
+            }
+            if (lower.match(/infaq|sedekah|amal|zakat|ngasih|sumbangan/)) {
+                return 'Sosial & Infaq';
+            }
+            if (lower.match(/obat|dokter|rumah sakit|apotek|vitamin/)) {
+                return 'Kesehatan';
+            }
+            if (lower.match(/baju|celana|sepatu|belanja|shop|online/)) {
+                return 'Belanja';
+            }
+            if (type === 'Pemasukan') {
+                if (lower.match(/gaji|omset|jual|terima|pendapatan|bonus/)) return 'Inflow / Pendapatan';
+                return 'Pemasukan Lain';
+            }
+            return 'Umum';
+        }
+
+        function cleanDescription(text, amount, accounts) {
+            let desc = text
+                .replace(/pemasukan|pengeluaran|masuk|keluar|rp\.?|transfer dari|transfer ke|transfer|pindah|dari|ke/gi, '')
+                .replace(/bsi|bjb|seabank|bca syariah|bca|ajaib|mandiri|bri|bni|gopay|ovo|dana|shopeepay|cash|tunai|dompet/gi, '')
+                .replace(/\b\d+([.,]\d+)?\s*(rb|ribu|k|jt|juta|j)\b/gi, '')
+                .replace(/\b\d{1,3}([.,]\d{3})+\b/g, '')
+                .replace(/\b\d+\b/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            if (!desc || desc.length < 2) {
+                desc = text.substring(0, 60);
+            }
+            return desc;
+        }
+
+        // ====================== MAIN PROCESS ======================
+
+        async function processAICommand(text) {
+            const lower = text.toLowerCase().trim();
+            const amount = parseAmount(text);
+            const accounts = detectAccounts(lower);
+            const primaryAccount = accounts.length > 0 ? accounts[0] : 'Cash';
+            const tanggal = detectDate(lower);
+            const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
+
+            // 1. Koreksi Saldo
+            const isBalanceAdjustment = (lower.includes('saldo') || lower.includes('set saldo') || lower.includes('update saldo')) 
+                                        && accounts.length > 0 && amount > 0;
+
+            if (isBalanceAdjustment) {
+                const { data: allTx } = await supabaseClient.from('transaksi').select('*');
+                let currentAccBalance = 0;
+                if (allTx) {
+                    allTx.forEach(row => {
+                        let jml = parseFloat(row.jumlah) || 0;
+                        let acc = row.akun || 'Cash';
+                        let isMasuk = (row.tipe || '').toLowerCase().includes('masuk');
+                        if (acc === primaryAccount) {
+                            if (isMasuk) currentAccBalance += jml;
+                            else currentAccBalance -= jml;
+                        }
+                    });
+                }
+
+                let selisih = amount - currentAccBalance;
+                if (Math.abs(selisih) < 1) {
+                    return `ℹ️ Saldo <b>${primaryAccount}</b> sudah sesuai: <b>${formatIDR(amount)}</b>`;
+                }
+
+                let adjType = selisih > 0 ? 'Pemasukan' : 'Pengeluaran';
+                let adjAmount = Math.abs(selisih);
+
+                const { error } = await supabaseClient.from('transaksi').insert([{
+                    tipe: adjType,
+                    kategori: 'Koreksi / Penyesuaian Saldo',
+                    akun: primaryAccount,
+                    keterangan: `Koreksi saldo ${primaryAccount} menjadi ${formatIDR(amount)}`,
+                    jumlah: adjAmount,
+                    tanggal: tanggal
+                }]);
+
+                if (error) return `❌ Gagal menyesuaikan saldo: ${error.message}`;
+
+                return `✅ <b>Saldo ${primaryAccount} diperbarui</b><br>
+                        • Saldo baru: <b class="text-emerald-400">${formatIDR(amount)}</b><br>
+                        • Penyesuaian: <span class="${adjType === 'Pemasukan' ? 'text-emerald-400' : 'text-rose-400'}">${adjType} ${formatIDR(adjAmount)}</span>`;
+            }
+
+            // 2. Minta Rekap
+            const isReport = (lower.includes('rekap') || lower.includes('laporan') || lower === 'saldo' || lower.includes('total')) && amount === 0;
+            if (isReport) {
+                return await fetchAndShowSummary();
+            }
+
+            // 3. Validasi nominal
+            if (amount <= 0) {
+                return `⚠️ Saya belum menemukan nominal yang jelas.<br>
+                        Coba ketik lebih spesifik, contoh:<br>
+                        • "beli bawang 15rb"<br>
+                        • "gaji masuk 5jt ke bca"<br>
+                        • "transfer 200rb dari bsi ke bjb"`;
+            }
+
+            // 4. Deteksi Transfer
+            const isTransfer = (lower.includes('transfer') || lower.includes('pindah') || lower.includes('kirim') || lower.includes('dari') && lower.includes('ke')) 
+                               && accounts.length >= 2;
+
+            if (isTransfer) {
+                let sourceAcc = accounts[0];
+                let destAcc = accounts[1];
+
+                const dariIndex = lower.indexOf('dari');
+                const keIndex = lower.indexOf('ke');
+
+                if (dariIndex > -1 && keIndex > dariIndex) {
+                    // Sesuai urutan
+                } else if (keIndex > -1 && dariIndex > keIndex) {
+                    sourceAcc = accounts[1];
+                    destAcc = accounts[0];
+                }
+
+                const { error: err1 } = await supabaseClient.from('transaksi').insert([{
+                    tipe: 'Pengeluaran',
+                    kategori: 'Transfer Internal',
+                    akun: sourceAcc,
+                    keterangan: `Transfer ke ${destAcc}`,
+                    jumlah: amount,
+                    tanggal: tanggal
+                }]);
+
+                const { error: err2 } = await supabaseClient.from('transaksi').insert([{
+                    tipe: 'Pemasukan',
+                    kategori: 'Transfer Internal',
+                    akun: destAcc,
+                    keterangan: `Terima dari ${sourceAcc}`,
+                    jumlah: amount,
+                    tanggal: tanggal
+                }]);
+
+                if (err1 || err2) return `❌ Gagal memproses transfer.`;
+
+                return `🔄 <b>Transfer Berhasil</b> (${tanggal})<br>
+                        • Dari: <b class="text-rose-400">${sourceAcc}</b> (-${formatIDR(amount)})<br>
+                        • Ke: <b class="text-emerald-400">${destAcc}</b> (+${formatIDR(amount)})`;
+            }
+
+            // 5. Transaksi biasa
+            let type = 'Pengeluaran';
+            if (lower.match(/masuk|pemasukan|terima|jual|omset|gaji|bonus|pendapatan|dapat/)) {
+                type = 'Pemasukan';
+            }
+
+            const category = detectCategory(lower, type);
+            const description = cleanDescription(text, amount, accounts);
+
+            const { error } = await supabaseClient.from('transaksi').insert([{
+                tipe: type,
+                kategori: category,
+                akun: primaryAccount,
+                keterangan: description,
+                jumlah: amount,
+                tanggal: tanggal
+            }]);
+
+            if (error) return `❌ Gagal menyimpan: ${error.message}`;
+
+            const badgeColor = type === 'Pemasukan' ? 'text-emerald-400' : 'text-rose-400';
+
+            return `✅ <b>Tercatat</b> (${tanggal})<br>
+                    • Tipe: <span class="${badgeColor} font-bold">${type}</span><br>
+                    • Akun: <b class="text-amber-400">${primaryAccount}</b><br>
+                    • Kategori: <b>${category}</b><br>
+                    • Jumlah: <b>${formatIDR(amount)}</b><br>
+                    • Keterangan: ${description}`;
+        }
+
+        async function fetchAndShowSummary() {
+            const { data, error } = await supabaseClient.from('transaksi').select('*');
+            if (error) return "Gagal mengambil data dari database.";
+
+            let totalMasuk = 0;
+            let totalKeluar = 0;
+            let accountBalances = {};
+
+            data.forEach(row => {
+                let jml = parseFloat(row.jumlah) || 0;
+                let tipeVal = row.tipe ? row.tipe.toLowerCase() : '';
+                let acc = row.akun || 'Cash';
+
+                if (!accountBalances[acc]) accountBalances[acc] = 0;
+
+                if (tipeVal.includes('masuk')) {
+                    totalMasuk += jml;
+                    accountBalances[acc] += jml;
+                } else {
+                    totalKeluar += jml;
+                    accountBalances[acc] -= jml;
+                }
+            });
+
+            let saldoBersih = totalMasuk - totalKeluar;
+            const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
+            let accSummaryText = Object.keys(accountBalances).map(acc => `• ${acc}: <b>${formatIDR(accountBalances[acc])}</b>`).join('<br>');
+
+            return `📊 <b>Ringkasan ChatRekap:</b><br>
+                • Total Pemasukan: <span class="text-emerald-400">${formatIDR(totalMasuk)}</span><br>
+                • Total Pengeluaran: <span class="text-rose-400">${formatIDR(totalKeluar)}</span><br>
+                • <b>Kekayaan Bersih: ${formatIDR(saldoBersih)}</b><br><br>
+                <b>Saldo Per Rekening / Bank:</b><br>${accSummaryText}<br>
+                <span class="text-[10px] text-slate-400">Total ${data.length} transaksi tercatat. Buka menu Laporan untuk rincian tabel.</span>`;
+        }
+
+        async function loadFinancialReport() {
+            const tbody = document.getElementById('accounting-table-body');
+            if (!tbody) return;
+            
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>`;
+
+            const { data, error } = await supabaseClient.from('transaksi').select('*').order('id', { ascending: false });
+            
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-rose-400">Gagal memuat data: ${error.message}</td></tr>`;
+                return;
+            }
+
+            let totalMasuk = 0;
+            let totalKeluar = 0;
+            let accountBalances = {};
+            tbody.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-500">Belum ada data transaksi.</td></tr>`;
+                document.getElementById('rep-total-masuk').innerText = 'Rp 0';
+                document.getElementById('rep-total-keluar').innerText = 'Rp 0';
+                document.getElementById('rep-net-saldo').innerText = 'Rp 0';
+                document.getElementById('rep-count').innerText = '0 Transaksi';
+                document.getElementById('accounts-summary-list').innerHTML = `<p class="text-xs text-slate-500 py-2">Belum ada akun aktif.</p>`;
+                return;
+            }
+
+            const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
+
+            data.forEach(row => {
+                let jml = parseFloat(row.jumlah) || 0;
+                let tipeVal = row.tipe ? row.tipe.toLowerCase() : '';
+                let isMasuk = tipeVal.includes('masuk');
+                let acc = row.akun || 'Cash';
+
+                if (!accountBalances[acc]) accountBalances[acc] = 0;
+                if (isMasuk) {
+                    totalMasuk += jml;
+                    accountBalances[acc] += jml;
+                } else {
+                    totalKeluar += jml;
+                    accountBalances[acc] -= jml;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-700/35 transition text-xs border-b border-slate-700/40";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 md:px-6 text-slate-400">${row.tanggal || '-'}</td>
+                    <td class="py-2.5 px-3 md:px-6 font-medium text-white">
+                        ${escapeHtml(row.keterangan || '-')}
+                        <div class="text-[10px] text-slate-400 md:hidden">${escapeHtml(row.kategori || '')}</div>
+                    </td>
+                    <td class="py-2.5 px-3 md:px-6">
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            ${escapeHtml(acc)}
+                        </span>
+                    </td>
+                    <td class="py-2.5 px-3 md:px-6">
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${isMasuk ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+                            ${row.tipe ? row.tipe.toUpperCase() : (isMasuk ? 'PEMASUKAN' : 'PENGELUARAN')}
+                        </span>
+                    </td>
+                    <td class="py-2.5 px-3 md:px-6 text-right font-semibold ${isMasuk ? 'text-emerald-400' : 'text-slate-600'}">${isMasuk ? formatIDR(jml) : '-'}</td>
+                    <td class="py-2.5 px-3 md:px-6 text-right font-semibold ${!isMasuk ? 'text-rose-400' : 'text-slate-600'}">${!isMasuk ? formatIDR(jml) : '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            let saldoBersih = totalMasuk - totalKeluar;
+            document.getElementById('rep-total-masuk').innerText = formatIDR(totalMasuk);
+            document.getElementById('rep-total-keluar').innerText = formatIDR(totalKeluar);
+            document.getElementById('rep-net-saldo').innerText = formatIDR(saldoBersih);
+            document.getElementById('rep-count').innerText = `${data.length} Transaksi`;
+
+            const accList = document.getElementById('accounts-summary-list');
+            accList.innerHTML = '';
+            for (const [accName, accBal] of Object.entries(accountBalances)) {
+                let badgeColor = accBal >= 0 ? 'text-emerald-400' : 'text-rose-400';
+                accList.innerHTML += `
+                    <div class="py-2.5 flex justify-between items-center text-xs md:text-sm">
+                        <span class="font-medium text-slate-300 flex items-center gap-2">
+                            <i class="fa-regular fa-credit-card text-amber-400 text-xs"></i> ${accName}
+                        </span>
+                        <span class="font-bold ${badgeColor}">${formatIDR(accBal)}</span>
                     </div>
                 `;
-            }, 300);
+            }
         }
 
-        async function loadAccountsData() {
-            const accList = document.getElementById('accounts-list');
-            accList.innerHTML = `
-                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
-                    <span class="font-medium text-sm">BCA</span>
-                    <span class="font-bold text-sm text-teal-700">Rp 1.500.000</span>
+        chatForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            userInput.value = '';
+
+            // Loading indicator bot
+            const loadingId = 'loading-' + Date.now();
+            const loadingWrapper = document.createElement('div');
+            loadingWrapper.id = loadingId;
+            loadingWrapper.className = 'flex items-start space-x-2.5';
+            loadingWrapper.innerHTML = `
+                <div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700">
+                    <img src="image_4cb225a3.jpg" alt="AI" class="w-full h-full object-cover">
                 </div>
-                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
-                    <span class="font-medium text-sm">BSI</span>
-                    <span class="font-bold text-sm text-teal-700">Rp 500.000</span>
+                <div class="bg-slate-800 border border-slate-700 p-3.5 rounded-2xl rounded-tl-none text-slate-400 text-xs shadow">
+                    <i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Menganalisis...
                 </div>
             `;
-        }
+            chatContainer.appendChild(loadingWrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
 
-        async function loadDashboardData() {
-            document.getElementById('total-balance-text').innerText = 'Rp 2.000.000';
-            loadTransactions();
-        }
+            const aiResponse = await processAICommand(text);
+
+            document.getElementById(loadingId).remove();
+            appendMessage('bot', aiResponse, true);
+        });
     </script>
 </body>
 </html>
