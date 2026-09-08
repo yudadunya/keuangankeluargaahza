@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ChatUang - Cukup chat, langsung tercatat.</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="image_acef2824.jpg">
     <!-- Tailwind CSS v3 (Stabil CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
@@ -16,9 +18,9 @@
     <!-- Mobile Header dengan Logo & Tagline -->
     <header class="bg-slate-800 border-b border-slate-700 px-4 py-2.5 flex justify-between items-center shadow-md z-20 flex-shrink-0">
         <div class="flex items-center space-x-3">
-            <!-- Logo Gambar Kustom -->
-            <div class="w-10 h-10 rounded-xl overflow-hidden bg-white border border-slate-700 flex items-center justify-center flex-shrink-0 shadow">
-                <img src="image_4cb225a3_3.jpg" alt="ChatUang Logo" class="w-full h-full object-contain p-0.5">
+            <!-- Logo Ikon Saja -->
+            <div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-700 flex items-center justify-center flex-shrink-0 shadow">
+                <img src="image_acef2824.jpg" alt="ChatUang Logo" class="w-full h-full object-cover">
             </div>
             <div>
                 <h1 class="font-bold text-sm text-white tracking-wide flex items-center gap-1.5">
@@ -41,8 +43,8 @@
             <div class="flex-1 overflow-y-auto p-3 md:p-6 space-y-3 max-w-4xl w-full mx-auto" id="chat-container">
                 <!-- Pesan Sambutan Bot -->
                 <div class="flex items-start space-x-2.5">
-                    <div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700 bg-white flex items-center justify-center">
-                        <img src="image_4cb225a3_3.jpg" alt="AI" class="w-full h-full object-contain">
+                    <div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700">
+                        <img src="image_acef2824.jpg" alt="AI" class="w-full h-full object-cover">
                     </div>
                     <div class="bg-slate-800 border border-slate-700 p-3.5 rounded-2xl rounded-tl-none max-w-[88%] md:max-w-xl text-xs md:text-sm leading-relaxed shadow">
                         <p class="font-semibold text-emerald-400 mb-1">Halo Mind Master!</p>
@@ -186,7 +188,7 @@
 
             let avatarHtml = isUser 
                 ? `<div class="bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">U</div>`
-                : `<div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700 bg-white flex items-center justify-center"><img src="image_4cb225a3_3.jpg" alt="AI" class="w-full h-full object-contain"></div>`;
+                : `<div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700"><img src="image_acef2824.jpg" alt="AI" class="w-full h-full object-cover"></div>`;
 
             let bubbleBg = isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-100 rounded-tl-none';
 
@@ -629,8 +631,8 @@
             loadingWrapper.id = loadingId;
             loadingWrapper.className = 'flex items-start space-x-2.5';
             loadingWrapper.innerHTML = `
-                <div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700 bg-white flex items-center justify-center">
-                    <img src="image_4cb225a3_3.jpg" alt="AI" class="w-full h-full object-contain">
+                <div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700">
+                    <img src="image_acef2824.jpg" alt="AI" class="w-full h-full object-cover">
                 </div>
                 <div class="bg-slate-800 border border-slate-700 p-3.5 rounded-2xl rounded-tl-none text-slate-400 text-xs shadow">
                     <i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Menganalisis...
