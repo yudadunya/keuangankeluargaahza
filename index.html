@@ -14,7 +14,7 @@
 <body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
     <!-- Mobile Header -->
-    <header class="bg-slate-800 border-b border-slate-700 px-4 py-3 flex justify-between items-center shadow-md z-10 flex-shrink-0">
+    <header class="bg-slate-800 border-b border-slate-700 px-4 py-3 flex justify-between items-center shadow-md z-20 flex-shrink-0">
         <div class="flex items-center space-x-2.5">
             <div class="bg-emerald-500 text-slate-900 p-2 rounded-xl font-bold flex items-center justify-center w-8 h-8 shadow-lg text-sm">
                 <i class="fa-solid fa-brain"></i>
@@ -30,8 +30,8 @@
         </button>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-hidden flex flex-col relative pb-16 md:pb-0">
+    <!-- Main Content Area (Diberi padding bawah agar tidak tertutup navbar) -->
+    <main class="flex-1 overflow-hidden flex flex-col relative pb-20">
 
         <!-- VIEW 1: CHAT AI -->
         <section id="view-chat" class="flex-1 flex flex-col h-full overflow-hidden">
@@ -53,7 +53,7 @@
             </div>
             
             <!-- Chat Input Footer -->
-            <footer class="bg-slate-800/90 backdrop-blur border-t border-slate-700 p-2.5 md:p-4 shadow-lg flex-shrink-0">
+            <footer class="bg-slate-800/95 backdrop-blur border-t border-slate-700 p-2.5 md:p-4 shadow-lg flex-shrink-0">
                 <form id="chat-form" class="max-w-4xl mx-auto flex gap-2">
                     <input 
                         type="text" 
@@ -128,15 +128,15 @@
 
     </main>
 
-    <!-- Bottom Navigation Bar -->
-    <nav class="bg-slate-800 border-t border-slate-700 px-4 py-2 flex justify-around items-center shadow-2xl z-20 flex-shrink-0 md:absolute md:top-4 md:right-6 md:w-auto md:border md:rounded-xl md:p-1 md:space-x-1 md:shadow-none">
-        <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col md:flex-row items-center md:space-x-1.5 py-1 px-4 rounded-xl text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer">
-            <i class="fa-solid fa-comments text-sm md:text-xs"></i>
-            <span class="text-[10px] md:text-xs mt-0.5 md:mt-0">Chat AI</span>
+    <!-- Bottom Navigation Bar (Fixed di Bawah Layar HP) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-6 py-2.5 flex justify-around items-center shadow-[0_-4px_15px_rgba(0,0,0,0.3)] z-50">
+        <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center py-1 px-6 rounded-xl text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer">
+            <i class="fa-solid fa-comments text-base"></i>
+            <span class="text-[10px] mt-0.5">Chat AI</span>
         </button>
-        <button onclick="switchTab('report')" id="nav-report" class="flex flex-col md:flex-row items-center md:space-x-1.5 py-1 px-4 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white cursor-pointer">
-            <i class="fa-solid fa-file-invoice-dollar text-sm md:text-xs"></i>
-            <span class="text-[10px] md:text-xs mt-0.5 md:mt-0">Laporan</span>
+        <button onclick="switchTab('report')" id="nav-report" class="flex flex-col items-center py-1 px-6 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white cursor-pointer">
+            <i class="fa-solid fa-file-invoice-dollar text-base"></i>
+            <span class="text-[10px] mt-0.5">Laporan</span>
         </button>
     </nav>
 
@@ -153,8 +153,8 @@
             const navChat = document.getElementById('nav-chat');
             const navReport = document.getElementById('nav-report');
 
-            const activeClass = "flex flex-col md:flex-row items-center md:space-x-1.5 py-1 px-4 rounded-xl text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer";
-            const inactiveClass = "flex flex-col md:flex-row items-center md:space-x-1.5 py-1 px-4 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white cursor-pointer";
+            const activeClass = "flex flex-col items-center py-1 px-6 rounded-xl text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer";
+            const inactiveClass = "flex flex-col items-center py-1 px-6 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white cursor-pointer";
 
             if (tab === 'chat') {
                 chatView.classList.remove('hidden');
@@ -201,7 +201,6 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-        // Deteksi Bank / Akun Cerdas
         function detectAccounts(textLower) {
             let found = [];
             const keywords = [
@@ -232,12 +231,10 @@
         async function processAICommand(text) {
             const lower = text.toLowerCase();
             
-            // Cek Ringkasan / Rekap
             if (lower.includes('rekap') || lower.includes('saldo') || lower.includes('laporan') || lower.includes('total')) {
                 return await fetchAndShowSummary();
             }
 
-            // Ekstrak Nominal Uang
             let amount = 0;
             const textWithoutUnits = text.replace(/(\d+[\.,]?\d*)\s*(kg|gr|gram|ltr|liter|ml|pcs|buah|bks|bungkus|pack|porsi)/gi, '');
             const remainingNumbers = textWithoutUnits.match(/(\d[\d\.,]*)/g);
@@ -251,11 +248,8 @@
                 return "Maaf, nominal uang belum terbaca dengan jelas. Coba sertakan angka nominalnya ya.";
             }
 
-            // Deteksi Akun
             let accounts = detectAccounts(lower);
             let primaryAccount = accounts.length > 0 ? accounts[0] : 'Cash';
-
-            // Cek apakah ini transfer antar 2 bank yang BERBEDA
             let isTrueTransfer = (lower.includes('transfer') || lower.includes('pindah') || lower.includes('tarik tunai')) && accounts.length >= 2 && accounts[0] !== accounts[1];
 
             const now = new Date();
@@ -280,7 +274,6 @@
                     • Ke: <b class="text-emerald-400">${destAcc}</b> (+${formatIDR(amount)})`;
             }
 
-            // Jika bukan transfer antar bank (bisa pengeluaran, pembayaran, infaq, atau pemasukan)
             let type = 'Pengeluaran';
             if (
                 lower.includes('masuk') || 
@@ -293,7 +286,6 @@
                 type = 'Pemasukan';
             }
 
-            // Otomatis Kategori Pintar
             let category = 'Umum';
             if (lower.includes('makan') || lower.includes('beli') || lower.includes('ayam') || lower.includes('bawang') || lower.includes('sayur') || lower.includes('beras') || lower.includes('dapur') || lower.includes('minum') || lower.includes('nutrijel') || lower.includes('gula') || lower.includes('susu') || lower.includes('tahu')) {
                 category = 'Konsumsi & Dapur';
@@ -309,7 +301,6 @@
                 category = 'Inflow / Pendapatan';
             }
 
-            // Bersihkan Keterangan dari Nominal & Bank
             let cleanDescription = text
                 .replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp|transfer dari|transfer ke|transfer|pindah/gi, '')
                 .replace(/bsi|bjb|seabank|bca syariah|bca|ajaib|mandiri|bri|bni|cash|tunai|dompet/gi, '')
