@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ChatRekap - Cukup chat, langsung tercatat.</title>
+    <title>ChatUang - Cukup chat, langsung tercatat.</title>
     <!-- Tailwind CSS v3 (Stabil CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
@@ -17,12 +17,12 @@
     <header class="bg-slate-800 border-b border-slate-700 px-4 py-2.5 flex justify-between items-center shadow-md z-20 flex-shrink-0">
         <div class="flex items-center space-x-3">
             <!-- Logo Gambar Kustom -->
-            <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 border border-slate-700 flex items-center justify-center flex-shrink-0 shadow">
-                <img src="image_4cb225a3.jpg" alt="ChatRekap Logo" class="w-full h-full object-cover">
+            <div class="w-10 h-10 rounded-xl overflow-hidden bg-white border border-slate-700 flex items-center justify-center flex-shrink-0 shadow">
+                <img src="image_4cb225a3_3.jpg" alt="ChatUang Logo" class="w-full h-full object-contain p-0.5">
             </div>
             <div>
                 <h1 class="font-bold text-sm text-white tracking-wide flex items-center gap-1.5">
-                    CHAT<span class="text-emerald-400">REKAP</span>
+                    CHAT<span class="text-emerald-400">UANG</span>
                 </h1>
                 <p class="text-[10px] text-slate-400 italic">Cukup chat, langsung tercatat.</p>
             </div>
@@ -41,12 +41,12 @@
             <div class="flex-1 overflow-y-auto p-3 md:p-6 space-y-3 max-w-4xl w-full mx-auto" id="chat-container">
                 <!-- Pesan Sambutan Bot -->
                 <div class="flex items-start space-x-2.5">
-                    <div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700">
-                        <img src="image_4cb225a3.jpg" alt="AI" class="w-full h-full object-cover">
+                    <div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700 bg-white flex items-center justify-center">
+                        <img src="image_4cb225a3_3.jpg" alt="AI" class="w-full h-full object-contain">
                     </div>
                     <div class="bg-slate-800 border border-slate-700 p-3.5 rounded-2xl rounded-tl-none max-w-[88%] md:max-w-xl text-xs md:text-sm leading-relaxed shadow">
                         <p class="font-semibold text-emerald-400 mb-1">Halo Mind Master!</p>
-                        <p class="text-slate-300">Selamat datang di <b>ChatRekap</b>. Cukup chat, langsung tercatat. Contoh perintah:</p>
+                        <p class="text-slate-300">Selamat datang di <b>ChatUang</b>. Cukup chat, langsung tercatat. Contoh perintah:</p>
                         <ul class="list-disc list-inside mt-1.5 space-y-1 text-slate-400">
                             <li><i>"saldo di rekening bjb sekarang 503099"</i></li>
                             <li><i>"transfer dari bsi ke bjb 150rb"</i></li>
@@ -98,7 +98,7 @@
             <div class="bg-slate-800 rounded-xl md:rounded-2xl border border-slate-700 p-4 shadow">
                 <h3 class="font-bold text-xs md:text-sm text-slate-200 mb-3 flex items-center justify-between">
                     <span><i class="fa-solid fa-wallet mr-1.5 text-emerald-400"></i> Rincian Saldo Per Rekening & Bank</span>
-                    <span class="text-[10px] text-slate-400 font-normal">ChatRekap Multi-Account</span>
+                    <span class="text-[10px] text-slate-400 font-normal">ChatUang Multi-Account</span>
                 </h3>
                 <div id="accounts-summary-list" class="divide-y divide-slate-700/60">
                     <!-- Data dimuat dinamis -->
@@ -186,7 +186,7 @@
 
             let avatarHtml = isUser 
                 ? `<div class="bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">U</div>`
-                : `<div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700"><img src="image_4cb225a3.jpg" alt="AI" class="w-full h-full object-cover"></div>`;
+                : `<div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700 bg-white flex items-center justify-center"><img src="image_4cb225a3_3.jpg" alt="AI" class="w-full h-full object-contain"></div>`;
 
             let bubbleBg = isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-100 rounded-tl-none';
 
@@ -517,7 +517,7 @@
             const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
             let accSummaryText = Object.keys(accountBalances).map(acc => `• ${acc}: <b>${formatIDR(accountBalances[acc])}</b>`).join('<br>');
 
-            return `📊 <b>Ringkasan ChatRekap:</b><br>
+            return `📊 <b>Ringkasan ChatUang:</b><br>
                 • Total Pemasukan: <span class="text-emerald-400">${formatIDR(totalMasuk)}</span><br>
                 • Total Pengeluaran: <span class="text-rose-400">${formatIDR(totalKeluar)}</span><br>
                 • <b>Kekayaan Bersih: ${formatIDR(saldoBersih)}</b><br><br>
@@ -629,8 +629,8 @@
             loadingWrapper.id = loadingId;
             loadingWrapper.className = 'flex items-start space-x-2.5';
             loadingWrapper.innerHTML = `
-                <div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700">
-                    <img src="image_4cb225a3.jpg" alt="AI" class="w-full h-full object-cover">
+                <div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-slate-700 bg-white flex items-center justify-center">
+                    <img src="image_4cb225a3_3.jpg" alt="AI" class="w-full h-full object-contain">
                 </div>
                 <div class="bg-slate-800 border border-slate-700 p-3.5 rounded-2xl rounded-tl-none text-slate-400 text-xs shadow">
                     <i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Menganalisis...
