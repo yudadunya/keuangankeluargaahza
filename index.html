@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ahza Capital - Mobile & Family Accounting</title>
+    <title>Ahza Capital - Multi-Account & Family Accounting</title>
     <!-- Tailwind CSS v3 (Stabil CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
@@ -21,7 +21,7 @@
             </div>
             <div>
                 <h1 class="font-bold text-sm text-white tracking-wide">Ahza Capital</h1>
-                <p class="text-[10px] text-slate-400">Mind Master & Multi-Account</p>
+                <p class="text-[10px] text-slate-400">Mind Master & Multi-Bank System</p>
             </div>
         </div>
         
@@ -41,11 +41,11 @@
                     <div class="bg-emerald-500 text-slate-900 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">AI</div>
                     <div class="bg-slate-800 border border-slate-700 p-3.5 rounded-2xl rounded-tl-none max-w-[88%] md:max-w-xl text-xs md:text-sm leading-relaxed shadow">
                         <p class="font-semibold text-emerald-400 mb-1">Halo Mind Master!</p>
-                        <p class="text-slate-300">Catat keuangan dengan pilihan akun (Cash, BCA, Ajaib, dll):</p>
+                        <p class="text-slate-300">Catat keuangan dengan berbagai pilihan rekening:</p>
                         <ul class="list-disc list-inside mt-1.5 space-y-1 text-slate-400">
-                            <li><i>"beli bawang merah 6000 pakai cash"</i></li>
-                            <li><i>"gaji 10jt masuk bca"</i></li>
-                            <li><i>"tarik tunai bca ke cash 500000"</i></li>
+                            <li><i>"beli token listrik 100rb bsi"</i></li>
+                            <li><i>"omset nadirasa 500rb masuk bjb"</i></li>
+                            <li><i>"tarik tunai seabank ke cash 300000"</i></li>
                             <li><i>"rekap keuangan"</i></li>
                         </ul>
                     </div>
@@ -58,7 +58,7 @@
                     <input 
                         type="text" 
                         id="user-input" 
-                        placeholder="Ketik transaksi (mis: beli bensin 50rb bca)..." 
+                        placeholder="Ketik transaksi (mis: bayar wifi 250rb bca syariah)..." 
                         class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition text-xs md:text-sm"
                         autocomplete="off"
                         required
@@ -89,26 +89,14 @@
                 </div>
             </div>
 
-            <!-- Ringkasan Saldo Per Akun (Card Grid) -->
+            <!-- Ringkasan Saldo Per Akun / Bank (Bentuk List Elegan) -->
             <div class="bg-slate-800 rounded-xl md:rounded-2xl border border-slate-700 p-4 shadow">
-                <h3 class="font-bold text-xs md:text-sm text-slate-200 mb-3"><i class="fa-solid fa-wallet mr-1.5 text-emerald-400"></i> Saldo Per Akun / Rekening</h3>
-                <div id="accounts-summary-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/60">
-                        <p class="text-[10px] text-slate-400">Cash / Dompet</p>
-                        <p id="acc-cash" class="text-sm font-bold text-white mt-0.5">Rp 0</p>
-                    </div>
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/60">
-                        <p class="text-[10px] text-slate-400">BCA</p>
-                        <p id="acc-bca" class="text-sm font-bold text-white mt-0.5">Rp 0</p>
-                    </div>
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/60">
-                        <p class="text-[10px] text-slate-400">Ajaib / Invest</p>
-                        <p id="acc-ajaib" class="text-sm font-bold text-white mt-0.5">Rp 0</p>
-                    </div>
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/60">
-                        <p class="text-[10px] text-slate-400">Lainnya / Umum</p>
-                        <p id="acc-umum" class="text-sm font-bold text-white mt-0.5">Rp 0</p>
-                    </div>
+                <h3 class="font-bold text-xs md:text-sm text-slate-200 mb-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-wallet mr-1.5 text-emerald-400"></i> Rincian Saldo Per Rekening & Bank</span>
+                    <span class="text-[10px] text-slate-400 font-normal">Multi-Account Active</span>
+                </h3>
+                <div id="accounts-summary-list" class="divide-y divide-slate-700/60">
+                    <!-- Data dimuat dinamis -->
                 </div>
             </div>
 
@@ -124,7 +112,7 @@
                             <tr class="bg-slate-900/60 text-slate-400 text-[10px] md:text-xs border-b border-slate-700 uppercase tracking-wider sticky top-0">
                                 <th class="py-2.5 px-3 md:px-6">Tanggal</th>
                                 <th class="py-2.5 px-3 md:px-6">Keterangan</th>
-                                <th class="py-2.5 px-3 md:px-6">Akun / Sumber</th>
+                                <th class="py-2.5 px-3 md:px-6">Akun / Bank</th>
                                 <th class="py-2.5 px-3 md:px-6">Tipe</th>
                                 <th class="py-2.5 px-3 md:px-6 text-right">Pemasukan</th>
                                 <th class="py-2.5 px-3 md:px-6 text-right">Pengeluaran</th>
@@ -213,6 +201,21 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
+        // Deteksi Akun/Bank Lengkap (BSI, BJB, Seabank, BCA Syariah, Ajaib, Cash)
+        function detectAccount(textLower) {
+            if (textLower.includes('bca syariah') || textLower.includes('bca-syariah')) return 'BCA Syariah';
+            if (textLower.includes('bsi')) return 'BSI';
+            if (textLower.includes('bjb')) return 'BJB';
+            if (textLower.includes('seabank')) return 'Seabank';
+            if (textLower.includes('ajaib')) return 'Ajaib';
+            if (textLower.includes('bca')) return 'BCA';
+            if (textLower.includes('mandiri')) return 'Mandiri';
+            if (textLower.includes('bri')) return 'BRI';
+            if (textLower.includes('bni')) return 'BNI';
+            if (textLower.includes('dompet') || textLower.includes('cash') || textLower.includes('tunai')) return 'Cash';
+            return 'Cash'; // Default jika tidak disebut
+        }
+
         async function processAICommand(text) {
             const lower = text.toLowerCase();
             
@@ -237,13 +240,7 @@
                 type = 'Pemasukan';
             }
 
-            let account = 'Cash';
-            if (lower.includes('bca')) account = 'BCA';
-            else if (lower.includes('ajaib')) account = 'Ajaib';
-            else if (lower.includes('mandiri')) account = 'Mandiri';
-            else if (lower.includes('bri')) account = 'BRI';
-            else if (lower.includes('bni')) account = 'BNI';
-            else if (lower.includes('dompet') || lower.includes('cash') || lower.includes('tunai')) account = 'Cash';
+            let account = detectAccount(lower);
 
             let category = 'Umum';
             if (lower.includes('makan') || lower.includes('beli') || lower.includes('ayam') || lower.includes('bawang') || lower.includes('sayur') || lower.includes('beras') || lower.includes('dapur') || lower.includes('minum')) {
@@ -271,10 +268,10 @@
             }
 
             if (amount === 0) {
-                return "Maaf, nominal harga belum terdeteksi. Contoh format: <b>'beli ayam 2kg 87000 pakai bca'</b>.";
+                return "Maaf, nominal harga belum terdeteksi. Contoh format: <b>'beli token listrik 50000 bsi'</b>.";
             }
 
-            let cleanDescription = text.replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp|bca|ajaib|mandiri|bri|bni|cash|tunai|dompet/gi, '').trim();
+            let cleanDescription = text.replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp|bsi|bjb|seabank|bca syariah|bca|ajaib|mandiri|bri|bni|cash|tunai|dompet/gi, '').trim();
             const now = new Date();
             const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
@@ -293,7 +290,7 @@
 
             if (error) {
                 console.error(error);
-                return `❌ Gagal menyimpan ke database Supabase: ${error.message} <br><small>Pastikan kolom 'akun' sudah dibuat di tabel Supabase Anda.</small>`;
+                return `❌ Gagal menyimpan ke database Supabase: ${error.message}`;
             }
 
             const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
@@ -301,20 +298,24 @@
             
             return `✅ Tercatat Otomatis (${localDate})!<br>
                 • Tipe: <span class="${badgeColor} font-bold">${type.toUpperCase()}</span><br>
-                • Akun / Sumber: <b class="text-amber-400">${account}</b><br>
+                • Sumber Bank/Akun: <b class="text-amber-400">${account}</b><br>
                 • Kategori: <b>${category}</b><br>
                 • Jumlah: <b>${formatIDR(amount)}</b><br>
                 • Keterangan: ${cleanDescription}`;
         }
 
         async function processTransferCommand(text, lower) {
-            const availableAccounts = ['bca', 'ajaib', 'mandiri', 'bri', 'bni', 'cash', 'tunai', 'dompet'];
+            const availableKeywords = ['bca syariah', 'bsi', 'bjb', 'seabank', 'ajaib', 'bca', 'mandiri', 'bri', 'bni', 'tunai', 'dompet', 'cash'];
             let foundAccounts = [];
             
-            availableAccounts.forEach(acc => {
-                if (lower.includes(acc)) {
-                    let standardName = (acc === 'tunai' || acc === 'dompet') ? 'Cash' : acc.toUpperCase();
-                    if (!foundAccounts.includes(standardName)) foundAccounts.push(standardName);
+            availableKeywords.forEach(kw => {
+                if (lower.includes(kw)) {
+                    let stdName = kw;
+                    if (kw === 'tunai' || kw === 'dompet') stdName = 'Cash';
+                    else if (kw === 'bca syariah') stdName = 'BCA Syariah';
+                    else stdName = kw.toUpperCase();
+
+                    if (!foundAccounts.includes(stdName)) foundAccounts.push(stdName);
                 }
             });
 
@@ -326,7 +327,7 @@
             }
 
             if (foundAccounts.length < 2 || amount === 0) {
-                return "Format transfer kurang lengkap. Contoh: <b>'tarik tunai bca ke cash 500000'</b> atau <b>'pindah dari bca ke ajaib 1000000'</b>.";
+                return "Format transfer kurang lengkap. Contoh: <b>'tarik tunai bjb ke cash 200000'</b> atau <b>'transfer dari seabank ke bsi 500000'</b>.";
             }
 
             let sourceAcc = foundAccounts[0];
@@ -348,8 +349,8 @@
 
             const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
             return `🔄 <b>Transfer Berhasil (${localDate}):</b><br>
-                • Dari Akun: <b class="text-rose-400">${sourceAcc}</b> (-${formatIDR(amount)})<br>
-                • Ke Akun: <b class="text-emerald-400">${destAcc}</b> (+${formatIDR(amount)})`;
+                • Dari Bank: <b class="text-rose-400">${sourceAcc}</b> (-${formatIDR(amount)})<br>
+                • Ke Bank: <b class="text-emerald-400">${destAcc}</b> (+${formatIDR(amount)})`;
         }
 
         async function fetchAndShowSummary() {
@@ -384,7 +385,7 @@
                 • Total Pemasukan: <span class="text-emerald-400">${formatIDR(totalMasuk)}</span><br>
                 • Total Pengeluaran: <span class="text-rose-400">${formatIDR(totalKeluar)}</span><br>
                 • <b>Kekayaan Bersih: ${formatIDR(saldoBersih)}</b><br><br>
-                <b>Saldo Per Rekening:</b><br>${accSummaryText}<br>
+                <b>Saldo Per Rekening / Bank:</b><br>${accSummaryText}<br>
                 <span class="text-[10px] text-slate-400">Total ${data.length} transaksi tercatat. Buka menu Laporan untuk rincian tabel.</span>`;
         }
 
@@ -403,7 +404,7 @@
 
             let totalMasuk = 0;
             let totalKeluar = 0;
-            let accountBalances = { 'Cash': 0, 'BCA': 0, 'Ajaib': 0, 'Umum': 0 };
+            let accountBalances = {};
             tbody.innerHTML = '';
 
             if (!data || data.length === 0) {
@@ -412,6 +413,7 @@
                 document.getElementById('rep-total-keluar').innerText = 'Rp 0';
                 document.getElementById('rep-net-saldo').innerText = 'Rp 0';
                 document.getElementById('rep-count').innerText = '0 Transaksi';
+                document.getElementById('accounts-summary-list').innerHTML = `<p class="text-xs text-slate-500 py-2">Belum ada akun aktif.</p>`;
                 return;
             }
 
@@ -441,7 +443,7 @@
                         <div class="text-[10px] text-slate-400 md:hidden">${escapeHtml(row.kategori || '')}</div>
                     </td>
                     <td class="py-2.5 px-3 md:px-6">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
                             ${escapeHtml(acc)}
                         </span>
                     </td>
@@ -456,20 +458,24 @@
                 tbody.appendChild(tr);
             });
 
+            // Update Global Summary Cards
             let saldoBersih = totalMasuk - totalKeluar;
             document.getElementById('rep-total-masuk').innerText = formatIDR(totalMasuk);
             document.getElementById('rep-total-keluar').innerText = formatIDR(totalKeluar);
             document.getElementById('rep-net-saldo').innerText = formatIDR(saldoBersih);
             document.getElementById('rep-count').innerText = `${data.length} Transaksi`;
 
-            const accGrid = document.getElementById('accounts-summary-grid');
-            accGrid.innerHTML = '';
+            // Update Per-Account Summary List (Bentuk Baris Elegan)
+            const accList = document.getElementById('accounts-summary-list');
+            accList.innerHTML = '';
             for (const [accName, accBal] of Object.entries(accountBalances)) {
-                let cardColor = accBal >= 0 ? 'text-white' : 'text-rose-400';
-                accGrid.innerHTML += `
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/60">
-                        <p class="text-[10px] text-slate-400">${accName}</p>
-                        <p class="text-sm font-bold ${cardColor} mt-0.5">${formatIDR(accBal)}</p>
+                let badgeColor = accBal >= 0 ? 'text-emerald-400' : 'text-rose-400';
+                accList.innerHTML += `
+                    <div class="py-2.5 flex justify-between items-center text-xs md:text-sm">
+                        <span class="font-medium text-slate-300 flex items-center gap-2">
+                            <i class="fa-regular fa-credit-card text-amber-400 text-xs"></i> ${accName}
+                        </span>
+                        <span class="font-bold ${badgeColor}">${formatIDR(accBal)}</span>
                     </div>
                 `;
             }
@@ -490,7 +496,7 @@
             loadingWrapper.innerHTML = `
                 <div class="bg-emerald-500 text-slate-900 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">AI</div>
                 <div class="bg-slate-800 border border-slate-700 text-slate-400 p-3.5 rounded-2xl rounded-tl-none text-xs shadow animate-pulse">
-                    Memproses transaksi multi-akun...
+                    Memproses transaksi bank...
                 </div>
             `;
             chatContainer.appendChild(loadingWrapper);
