@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>CuanCerdas - AI Financial Advisor & Assistant</title>
     <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="image_e81e3cb1.jpg">
@@ -33,14 +33,31 @@
         }
     </script>
     <style>
+        /* Menggunakan 100dvh agar fleksibel mengikuti bar browser HP */
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #0b141a;
+        }
+
         .wa-wallpaper {
             background-color: #0b141a;
             background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
             background-size: 24px 24px;
         }
+
+        /* Safe area handling untuk HP ber-notch / gesture bar di bawah */
+        .safe-bottom-nav {
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(3.5rem + env(safe-area-inset-bottom));
+        }
+
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
@@ -48,7 +65,7 @@
         }
     </style>
 </head>
-<body class="bg-wa-dark text-slate-100 h-screen flex flex-col md:flex-row font-sans overflow-hidden">
+<body class="bg-wa-dark text-slate-100 h-[100dvh] flex flex-col md:flex-row font-sans overflow-hidden">
 
     <!-- DESKTOP SIDEBAR / MOBILE HEADER CONTAINER -->
     <aside class="w-full md:w-80 lg:w-96 bg-wa-panel border-r border-slate-700/40 flex flex-col flex-shrink-0 z-20">
@@ -127,7 +144,8 @@
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-3" id="chat-container">
+            <!-- Area Chat yang fleksibel dengan padding bawah agar tidak tertutup form -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 pb-24 md:pb-6" id="chat-container">
                 <div class="flex items-end space-x-2">
                     <div class="bg-wa-bubbleIn border border-slate-700/50 p-3 rounded-2xl rounded-bl-sm max-w-[88%] md:max-w-xl text-xs md:text-sm leading-relaxed shadow-md relative">
                         <p class="font-semibold text-wa-green mb-1">Salam, Mind Master!</p>
@@ -142,7 +160,8 @@
                 </div>
             </div>
 
-            <footer class="bg-wa-panel border-t border-slate-700/40 p-3 pb-16 md:pb-3 flex-shrink-0">
+            <!-- Footer Chat mengambang tepat di atas nav bar mobile -->
+            <footer class="bg-wa-panel border-t border-slate-700/40 p-2.5 md:p-3 fixed md:relative bottom-[3.5rem] md:bottom-0 left-0 right-0 z-20 flex-shrink-0">
                 <form id="chat-form" class="max-w-4xl mx-auto flex items-center gap-2">
                     <button type="button" class="text-slate-400 hover:text-white px-2 py-1"><i class="fa-regular fa-face-smile text-lg"></i></button>
                     <input 
@@ -161,7 +180,7 @@
         </section>
 
         <!-- VIEW 2: LAPORAN & HEALTH CHECK-UP -->
-        <section id="view-report" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-5 bg-wa-dark hidden pb-20 md:pb-8">
+        <section id="view-report" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-5 bg-wa-dark hidden pb-24 md:pb-8">
             
             <div class="flex justify-between items-center bg-wa-panel p-4 rounded-xl border border-slate-700/40">
                 <div>
@@ -241,7 +260,7 @@
     </main>
 
     <!-- Mobile Bottom Navigation Bar -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-wa-panel border-t border-slate-700/40 px-6 py-2.5 flex justify-around items-center z-50">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-wa-panel border-t border-slate-700/40 px-6 py-2 flex justify-around items-center z-50 safe-bottom-nav shadow-xl">
         <button onclick="switchView('chat')" id="nav-chat" class="flex flex-col items-center text-wa-green text-xs font-semibold">
             <i class="fa-solid fa-comments text-lg"></i>
             <span class="text-[10px] mt-0.5">Chat</span>
@@ -406,7 +425,6 @@
             return !desc || desc.length < 2 ? text.substring(0, 50) : desc;
         }
 
-        // ====================== AI ADVISOR & PROCESS ENGINE ======================
         async function processAICommand(text) {
             const lower = text.toLowerCase().trim();
             const amount = parseAmount(text);
@@ -415,7 +433,6 @@
             const tanggal = detectDate(lower);
             const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
 
-            // Pertanyaan Konsultasi / Saran / Kesehatan Keuangan
             if (lower.includes('saran') || lower.includes('bagaimana') || lower.includes('tips') || lower.includes('konsul') || lower.includes('sehat')) {
                 const { data: allTx } = await supabaseClient.from('transaksi').select('*');
                 let masuk = 0, keluar = 0;
@@ -442,7 +459,6 @@
                 return adviceHTML;
             }
 
-            // Koreksi Saldo
             if ((lower.includes('saldo') || lower.includes('set saldo')) && accounts.length > 0 && amount > 0) {
                 const { data: allTx } = await supabaseClient.from('transaksi').select('*');
                 let currentBal = 0;
@@ -467,7 +483,6 @@
                 return `✅ <b>Saldo ${primaryAccount} diperbarui</b><br>• Saldo Baru: <b class="text-wa-green">${formatIDR(amount)}</b><br><br>💡 <i>Insight:</i> Rekonsiliasi saldo rutin memastikan kontrol aset Anda tetap presisi.`;
             }
 
-            // Rekap Cepat
             if ((lower.includes('rekap') || lower.includes('laporan') || lower === 'saldo') && amount === 0) {
                 return await fetchAndShowSummary();
             }
@@ -476,7 +491,6 @@
                 return `⚠️ Nominal tidak terdeteksi jelas. Contoh perintah:<br>• "beli bahan baku nadirasa 350rb"<br>• "omset masuk 1.5jt ke bjb"<br>• "saran untuk keuangan saya"`;
             }
 
-            // Transfer antar akun
             if ((lower.includes('transfer') || lower.includes('pindah')) && accounts.length >= 2) {
                 let sourceAcc = accounts[0], destAcc = accounts[1];
                 await supabaseClient.from('transaksi').insert([
@@ -486,7 +500,6 @@
                 return `🔄 <b>Transfer Berhasil</b><br>• Dari: <b>${sourceAcc}</b> (-${formatIDR(amount)})<br>• Ke: <b class="text-wa-green">${destAcc}</b> (+${formatIDR(amount)})<br><br>💡 <i>Insight:</i> Perpindahan dana internal terekam rapi tanpa mengganggu total kekayaan bersih.`;
             }
 
-            // Transaksi Regular + Insight Konsultan Otomatis
             let type = lower.match(/masuk|terima|jual|omset|gaji|bonus/) ? 'Pemasukan' : 'Pengeluaran';
             let category = detectCategory(lower, type);
             let description = cleanDescription(text, amount, accounts);
@@ -570,7 +583,6 @@
                 accList.innerHTML += `<div class="py-2 flex justify-between text-xs"><span><i class="fa-solid fa-wallet text-wa-green mr-2"></i>${k}</span><span class="font-bold ${v >= 0 ? 'text-white' : 'text-rose-400'}">${formatIDR(v)}</span></div>`;
             }
 
-            // Generate AI Health Advice
             let savingRate = totalMasuk > 0 ? (((totalMasuk - totalKeluar) / totalMasuk) * 100).toFixed(1) : 0;
             let healthMsg = `<b>Skor Kesehatan Keuangan:</b> Total pemasukan tercatat ${formatIDR(totalMasuk)} dengan pengeluaran ${formatIDR(totalKeluar)}.<br>`;
             healthMsg += `• <i>Net Savings Rate:</i> <b>${savingRate}%</b> dari total pemasukan.<br>`;
