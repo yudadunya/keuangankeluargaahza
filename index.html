@@ -33,7 +33,6 @@
         }
     </script>
     <style>
-        /* Menggunakan 100dvh agar fleksibel mengikuti bar browser HP */
         html, body {
             height: 100%;
             height: 100dvh;
@@ -49,7 +48,6 @@
             background-size: 24px 24px;
         }
 
-        /* Safe area handling untuk HP ber-notch / gesture bar di bawah */
         .safe-bottom-nav {
             padding-bottom: env(safe-area-inset-bottom);
             height: calc(3.5rem + env(safe-area-inset-bottom));
@@ -79,9 +77,10 @@
                     <p class="text-[11px] text-wa-green font-medium">Online • Mind Master Advisor</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-4 text-slate-300">
+            <div class="flex items-center space-x-3 text-slate-300">
                 <button onclick="switchView('chat')" title="Chat & Konsultasi" class="hover:text-wa-green transition cursor-pointer"><i class="fa-solid fa-comment-dots text-lg"></i></button>
-                <button onclick="switchView('report')" title="Laporan & Kesehatan Keuangan" class="hover:text-wa-green transition cursor-pointer"><i class="fa-solid fa-chart-pie text-lg"></i></button>
+                <button onclick="switchView('report')" title="Dashboard" class="hover:text-wa-green transition cursor-pointer"><i class="fa-solid fa-chart-pie text-lg"></i></button>
+                <button onclick="switchView('journal')" title="Jurnal Transaksi" class="hover:text-wa-green transition cursor-pointer"><i class="fa-solid fa-book-journal-whills text-lg"></i></button>
             </div>
         </div>
 
@@ -106,9 +105,21 @@
                     </div>
                     <div class="flex-1 overflow-hidden">
                         <div class="flex justify-between items-center">
-                            <span class="font-semibold text-xs text-white">Dashboard & Advisor</span>
+                            <span class="font-semibold text-xs text-white">Dashboard Advisor</span>
                         </div>
-                        <p class="text-[11px] text-slate-400 truncate">Analisis kesehatan & jurnal</p>
+                        <p class="text-[11px] text-slate-400 truncate">Analisis kesehatan & metrik</p>
+                    </div>
+                </button>
+
+                <button onclick="switchView('journal')" id="sidebar-btn-journal" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-wa-hover text-left transition cursor-pointer">
+                    <div class="w-9 h-9 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-book-journal-whills"></i>
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-xs text-white">Jurnal Transaksi</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 truncate">Daftar lengkap riwayat kas</p>
                     </div>
                 </button>
             </div>
@@ -120,12 +131,11 @@
         </div>
     </aside>
 
-    <!-- MAIN CHAT & CONTENT AREA -->
+    <!-- MAIN CONTENT AREA -->
     <main class="flex-1 flex flex-col h-full overflow-hidden relative">
 
         <!-- VIEW 1: CHAT & ADVISOR ROOM -->
         <section id="view-chat" class="flex-1 flex flex-col h-full overflow-hidden wa-wallpaper">
-            
             <div class="bg-wa-header px-4 py-2.5 flex justify-between items-center border-b border-slate-700/40 shadow-sm z-10 flex-shrink-0">
                 <div class="flex items-center space-x-3">
                     <div class="w-9 h-9 rounded-full overflow-hidden border border-wa-green/30 flex-shrink-0">
@@ -137,14 +147,10 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-3 text-slate-300">
-                    <button onclick="loadFinancialReport(); switchView('report');" class="md:hidden text-xs bg-wa-hover px-2.5 py-1 rounded-md border border-slate-600">
-                        <i class="fa-solid fa-chart-pie mr-1"></i> Dashboard
-                    </button>
                     <button onclick="clearChatContainer()" title="Bersihkan Chat" class="hover:text-white"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                 </div>
             </div>
 
-            <!-- Area Chat yang fleksibel dengan padding bawah agar tidak tertutup form -->
             <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 pb-24 md:pb-6" id="chat-container">
                 <div class="flex items-end space-x-2">
                     <div class="bg-wa-bubbleIn border border-slate-700/50 p-3 rounded-2xl rounded-bl-sm max-w-[88%] md:max-w-xl text-xs md:text-sm leading-relaxed shadow-md relative">
@@ -160,7 +166,6 @@
                 </div>
             </div>
 
-            <!-- Footer Chat mengambang tepat di atas nav bar mobile -->
             <footer class="bg-wa-panel border-t border-slate-700/40 p-2.5 md:p-3 fixed md:relative bottom-[3.5rem] md:bottom-0 left-0 right-0 z-20 flex-shrink-0">
                 <form id="chat-form" class="max-w-4xl mx-auto flex items-center gap-2">
                     <button type="button" class="text-slate-400 hover:text-white px-2 py-1"><i class="fa-regular fa-face-smile text-lg"></i></button>
@@ -181,7 +186,6 @@
 
         <!-- VIEW 2: LAPORAN & HEALTH CHECK-UP -->
         <section id="view-report" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-5 bg-wa-dark hidden pb-24 md:pb-8">
-            
             <div class="flex justify-between items-center bg-wa-panel p-4 rounded-xl border border-slate-700/40">
                 <div>
                     <h2 class="font-bold text-sm md:text-base text-white flex items-center gap-2">
@@ -230,11 +234,25 @@
                     <!-- Dinamis -->
                 </div>
             </div>
+        </section>
 
-            <!-- Tabel Jurnal Transaksi -->
+        <!-- VIEW 3: JURNAL TRANSAKSI (Tersendiri) -->
+        <section id="view-journal" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-5 bg-wa-dark hidden pb-24 md:pb-8">
+            <div class="flex justify-between items-center bg-wa-panel p-4 rounded-xl border border-slate-700/40">
+                <div>
+                    <h2 class="font-bold text-sm md:text-base text-white flex items-center gap-2">
+                        <i class="fa-solid fa-book-journal-whills text-wa-green"></i> Jurnal Transaksi
+                    </h2>
+                    <p class="text-xs text-slate-400">Daftar lengkap seluruh arus kas masuk dan keluar secara kronologis.</p>
+                </div>
+                <button onclick="loadFinancialReport()" class="bg-wa-green hover:bg-emerald-600 text-slate-900 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow cursor-pointer">
+                    <i class="fa-solid fa-rotate-right"></i> Refresh
+                </button>
+            </div>
+
             <div class="bg-wa-panel rounded-xl border border-slate-700/40 shadow-lg overflow-hidden flex flex-col mb-4">
                 <div class="px-4 py-3 border-b border-slate-700/40 bg-wa-dark/40 flex justify-between items-center">
-                    <h3 class="font-bold text-xs md:text-sm text-slate-200"><i class="fa-solid fa-book-journal-whills mr-1.5 text-wa-green"></i> Jurnal Transaksi</h3>
+                    <h3 class="font-bold text-xs md:text-sm text-slate-200">Riwayat Buku Besar</h3>
                     <span id="rep-count" class="text-[10px] bg-slate-700 text-slate-300 px-2.5 py-0.5 rounded-full">0 Transaksi</span>
                 </div>
                 <div class="overflow-x-auto">
@@ -259,15 +277,19 @@
 
     </main>
 
-    <!-- Mobile Bottom Navigation Bar -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-wa-panel border-t border-slate-700/40 px-6 py-2 flex justify-around items-center z-50 safe-bottom-nav shadow-xl">
+    <!-- Mobile Bottom Navigation Bar (3 Menu) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-wa-panel border-t border-slate-700/40 px-4 py-2 flex justify-around items-center z-50 safe-bottom-nav shadow-xl">
         <button onclick="switchView('chat')" id="nav-chat" class="flex flex-col items-center text-wa-green text-xs font-semibold">
-            <i class="fa-solid fa-comments text-lg"></i>
-            <span class="text-[10px] mt-0.5">Chat</span>
+            <i class="fa-solid fa-comments text-base"></i>
+            <span class="text-[9px] mt-0.5">Chat</span>
         </button>
         <button onclick="switchView('report'); loadFinancialReport();" id="nav-report" class="flex flex-col items-center text-slate-400 hover:text-white text-xs font-semibold">
-            <i class="fa-solid fa-chart-pie text-lg"></i>
-            <span class="text-[10px] mt-0.5">Dashboard</span>
+            <i class="fa-solid fa-chart-pie text-base"></i>
+            <span class="text-[9px] mt-0.5">Dashboard</span>
+        </button>
+        <button onclick="switchView('journal'); loadFinancialReport();" id="nav-journal" class="flex flex-col items-center text-slate-400 hover:text-white text-xs font-semibold">
+            <i class="fa-solid fa-book-journal-whills text-base"></i>
+            <span class="text-[9px] mt-0.5">Jurnal</span>
         </button>
     </nav>
 
@@ -281,25 +303,44 @@
         function switchView(view) {
             const chatView = document.getElementById('view-chat');
             const reportView = document.getElementById('view-report');
+            const journalView = document.getElementById('view-journal');
+            
             const btnChatSide = document.getElementById('sidebar-btn-chat');
             const btnReportSide = document.getElementById('sidebar-btn-report');
+            const btnJournalSide = document.getElementById('sidebar-btn-journal');
+
             const navChatMob = document.getElementById('nav-chat');
             const navReportMob = document.getElementById('nav-report');
+            const navJournalMob = document.getElementById('nav-journal');
 
+            // Sembunyikan semua view dulu
+            chatView.classList.add('hidden');
+            reportView.classList.add('hidden');
+            journalView.classList.add('hidden');
+
+            // Reset warna tombol sidebar & mobile
+            if(btnChatSide) btnChatSide.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-wa-hover text-left transition cursor-pointer";
+            if(btnReportSide) btnReportSide.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-wa-hover text-left transition cursor-pointer";
+            if(btnJournalSide) btnJournalSide.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-wa-hover text-left transition cursor-pointer";
+
+            if(navChatMob) navChatMob.className = "flex flex-col items-center text-slate-400 hover:text-white text-xs font-semibold";
+            if(navReportMob) navReportMob.className = "flex flex-col items-center text-slate-400 hover:text-white text-xs font-semibold";
+            if(navJournalMob) navJournalMob.className = "flex flex-col items-center text-slate-400 hover:text-white text-xs font-semibold";
+
+            // Tampilkan view yang dipilih
             if (view === 'chat') {
                 chatView.classList.remove('hidden');
-                reportView.classList.add('hidden');
                 if(btnChatSide) btnChatSide.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg bg-wa-hover text-left transition cursor-pointer";
-                if(btnReportSide) btnReportSide.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-wa-hover text-left transition cursor-pointer";
                 if(navChatMob) navChatMob.className = "flex flex-col items-center text-wa-green text-xs font-semibold";
-                if(navReportMob) navReportMob.className = "flex flex-col items-center text-slate-400 hover:text-white text-xs font-semibold";
-            } else {
-                chatView.classList.add('hidden');
+            } else if (view === 'report') {
                 reportView.classList.remove('hidden');
-                if(btnChatSide) btnChatSide.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-wa-hover text-left transition cursor-pointer";
                 if(btnReportSide) btnReportSide.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg bg-wa-hover text-left transition cursor-pointer";
-                if(navChatMob) navChatMob.className = "flex flex-col items-center text-slate-400 hover:text-white text-xs font-semibold";
                 if(navReportMob) navReportMob.className = "flex flex-col items-center text-wa-green text-xs font-semibold";
+                loadFinancialReport();
+            } else if (view === 'journal') {
+                journalView.classList.remove('hidden');
+                if(btnJournalSide) btnJournalSide.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg bg-wa-hover text-left transition cursor-pointer";
+                if(navJournalMob) navJournalMob.className = "flex flex-col items-center text-wa-green text-xs font-semibold";
                 loadFinancialReport();
             }
         }
@@ -540,12 +581,12 @@
             const tbody = document.getElementById('accounting-table-body');
             const healthBox = document.getElementById('ai-health-advice');
             if (!tbody) return;
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat analisis...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>`;
 
             const { data } = await supabaseClient.from('transaksi').select('*').order('id', { ascending: false });
             if (!data || data.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-500">Belum ada transaksi tercatat.</td></tr>`;
-                healthBox.innerHTML = `Belum ada data keuangan untuk dianalisis. Mulai catat transaksi Anda melalui chat!`;
+                if(healthBox) healthBox.innerHTML = `Belum ada data keuangan untuk dianalisis. Mulai catat transaksi Anda melalui chat!`;
                 return;
             }
 
@@ -572,28 +613,32 @@
                 `;
             });
 
-            document.getElementById('rep-total-masuk').innerText = formatIDR(totalMasuk);
-            document.getElementById('rep-total-keluar').innerText = formatIDR(totalKeluar);
-            document.getElementById('rep-net-saldo').innerText = formatIDR(totalMasuk - totalKeluar);
-            document.getElementById('rep-count').innerText = `${data.length} Transaksi`;
+            if(document.getElementById('rep-total-masuk')) document.getElementById('rep-total-masuk').innerText = formatIDR(totalMasuk);
+            if(document.getElementById('rep-total-keluar')) document.getElementById('rep-total-keluar').innerText = formatIDR(totalKeluar);
+            if(document.getElementById('rep-net-saldo')) document.getElementById('rep-net-saldo').innerText = formatIDR(totalMasuk - totalKeluar);
+            if(document.getElementById('rep-count')) document.getElementById('rep-count').innerText = `${data.length} Transaksi`;
 
             const accList = document.getElementById('accounts-summary-list');
-            accList.innerHTML = '';
-            for (const [k, v] of Object.entries(accountBalances)) {
-                accList.innerHTML += `<div class="py-2 flex justify-between text-xs"><span><i class="fa-solid fa-wallet text-wa-green mr-2"></i>${k}</span><span class="font-bold ${v >= 0 ? 'text-white' : 'text-rose-400'}">${formatIDR(v)}</span></div>`;
+            if(accList) {
+                accList.innerHTML = '';
+                for (const [k, v] of Object.entries(accountBalances)) {
+                    accList.innerHTML += `<div class="py-2 flex justify-between text-xs"><span><i class="fa-solid fa-wallet text-wa-green mr-2"></i>${k}</span><span class="font-bold ${v >= 0 ? 'text-white' : 'text-rose-400'}">${formatIDR(v)}</span></div>`;
+                }
             }
 
-            let savingRate = totalMasuk > 0 ? (((totalMasuk - totalKeluar) / totalMasuk) * 100).toFixed(1) : 0;
-            let healthMsg = `<b>Skor Kesehatan Keuangan:</b> Total pemasukan tercatat ${formatIDR(totalMasuk)} dengan pengeluaran ${formatIDR(totalKeluar)}.<br>`;
-            healthMsg += `• <i>Net Savings Rate:</i> <b>${savingRate}%</b> dari total pemasukan.<br>`;
-            if (savingRate >= 30) {
-                healthMsg += `🌟 <b>Luar Biasa!</b> Anda memiliki disiplin menabung di atas 30%. Ini mencerminkan prinsip *Margin of Safety* yang sangat baik untuk ketahanan finansial dan modal ekspansi bisnis ke depan.`;
-            } else if (savingRate > 0) {
-                healthMsg += `👍 <b>Cukup Baik.</b> Arus kas positif, namun tingkatkan porsi tabungan/investasi secara bertahap untuk memperkuat fondasi kekayaan jangka panjang.`;
-            } else {
-                healthMsg += `⚠️ <b>Perhatian:</b> Pengeluaran melebihi pemasukan. Evaluasi kembali pos pengeluaran non-esensial dan prioritaskan penyeimbangan arus kas bulanan.`;
+            if(healthBox) {
+                let savingRate = totalMasuk > 0 ? (((totalMasuk - totalKeluar) / totalMasuk) * 100).toFixed(1) : 0;
+                let healthMsg = `<b>Skor Kesehatan Keuangan:</b> Total pemasukan tercatat ${formatIDR(totalMasuk)} dengan pengeluaran ${formatIDR(totalKeluar)}.<br>`;
+                healthMsg += `• <i>Net Savings Rate:</i> <b>${savingRate}%</b> dari total pemasukan.<br>`;
+                if (savingRate >= 30) {
+                    healthMsg += `🌟 <b>Luar Biasa!</b> Anda memiliki disiplin menabung di atas 30%. Ini mencerminkan prinsip *Margin of Safety* yang sangat baik untuk ketahanan finansial dan modal ekspansi bisnis ke depan.`;
+                } else if (savingRate > 0) {
+                    healthMsg += `👍 <b>Cukup Baik.</b> Arus kas positif, namun tingkatkan porsi tabungan/investasi secara bertahap untuk memperkuat fondasi kekayaan jangka panjang.`;
+                } else {
+                    healthMsg += `⚠️ <b>Perhatian:</b> Pengeluaran melebihi pemasukan. Evaluasi kembali pos pengeluaran non-esensial dan prioritaskan penyeimbangan arus kas bulanan.`;
+                }
+                healthBox.innerHTML = healthMsg;
             }
-            healthBox.innerHTML = healthMsg;
         }
 
         chatForm.addEventListener('submit', async function(e) {
