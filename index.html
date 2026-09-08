@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ahza Capital - Multi-Account & Family Accounting</title>
+    <title>Ahza Capital - Smart AI Accounting</title>
     <!-- Tailwind CSS v3 (Stabil CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
@@ -21,7 +21,7 @@
             </div>
             <div>
                 <h1 class="font-bold text-sm text-white tracking-wide">Ahza Capital</h1>
-                <p class="text-[10px] text-slate-400">Mind Master & Multi-Bank System</p>
+                <p class="text-[10px] text-slate-400">Smart Natural AI System</p>
             </div>
         </div>
         
@@ -41,11 +41,11 @@
                     <div class="bg-emerald-500 text-slate-900 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">AI</div>
                     <div class="bg-slate-800 border border-slate-700 p-3.5 rounded-2xl rounded-tl-none max-w-[88%] md:max-w-xl text-xs md:text-sm leading-relaxed shadow">
                         <p class="font-semibold text-emerald-400 mb-1">Halo Mind Master!</p>
-                        <p class="text-slate-300">Catat keuangan dengan berbagai pilihan rekening:</p>
+                        <p class="text-slate-300">Ketik saja apa pun secara bebas seperti ngobrol biasa. Contoh:</p>
                         <ul class="list-disc list-inside mt-1.5 space-y-1 text-slate-400">
-                            <li><i>"beli token listrik 100rb bsi"</i></li>
+                            <li><i>"transfer dari bsi ke bsi UQ 1454000 untuk spp teteh"</i></li>
+                            <li><i>"ngasih ke mamah 50rb"</i></li>
                             <li><i>"omset nadirasa 500rb masuk bjb"</i></li>
-                            <li><i>"tarik tunai seabank ke cash 300000"</i></li>
                             <li><i>"rekap keuangan"</i></li>
                         </ul>
                     </div>
@@ -58,7 +58,7 @@
                     <input 
                         type="text" 
                         id="user-input" 
-                        placeholder="Ketik transaksi (mis: bayar wifi 250rb bca syariah)..." 
+                        placeholder="Ketik transaksi bebas tanpa format kaku..." 
                         class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition text-xs md:text-sm"
                         autocomplete="off"
                         required
@@ -89,11 +89,11 @@
                 </div>
             </div>
 
-            <!-- Ringkasan Saldo Per Akun / Bank (Bentuk List Elegan) -->
+            <!-- Ringkasan Saldo Per Akun / Bank -->
             <div class="bg-slate-800 rounded-xl md:rounded-2xl border border-slate-700 p-4 shadow">
                 <h3 class="font-bold text-xs md:text-sm text-slate-200 mb-3 flex items-center justify-between">
                     <span><i class="fa-solid fa-wallet mr-1.5 text-emerald-400"></i> Rincian Saldo Per Rekening & Bank</span>
-                    <span class="text-[10px] text-slate-400 font-normal">Multi-Account Active</span>
+                    <span class="text-[10px] text-slate-400 font-normal">Smart Multi-Account</span>
                 </h3>
                 <div id="accounts-summary-list" class="divide-y divide-slate-700/60">
                     <!-- Data dimuat dinamis -->
@@ -201,32 +201,86 @@
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-        // Deteksi Akun/Bank Lengkap (BSI, BJB, Seabank, BCA Syariah, Ajaib, Cash)
-        function detectAccount(textLower) {
-            if (textLower.includes('bca syariah') || textLower.includes('bca-syariah')) return 'BCA Syariah';
-            if (textLower.includes('bsi')) return 'BSI';
-            if (textLower.includes('bjb')) return 'BJB';
-            if (textLower.includes('seabank')) return 'Seabank';
-            if (textLower.includes('ajaib')) return 'Ajaib';
-            if (textLower.includes('bca')) return 'BCA';
-            if (textLower.includes('mandiri')) return 'Mandiri';
-            if (textLower.includes('bri')) return 'BRI';
-            if (textLower.includes('bni')) return 'BNI';
-            if (textLower.includes('dompet') || textLower.includes('cash') || textLower.includes('tunai')) return 'Cash';
-            return 'Cash'; // Default jika tidak disebut
+        // Deteksi Bank / Akun Cerdas
+        function detectAccounts(textLower) {
+            let found = [];
+            const keywords = [
+                { key: 'bca syariah', name: 'BCA Syariah' },
+                { key: 'bca-syariah', name: 'BCA Syariah' },
+                { key: 'bsi', name: 'BSI' },
+                { key: 'bjb', name: 'BJB' },
+                { key: 'seabank', name: 'Seabank' },
+                { key: 'ajaib', name: 'Ajaib' },
+                { key: 'bca', name: 'BCA' },
+                { key: 'mandiri', name: 'Mandiri' },
+                { key: 'bri', name: 'BRI' },
+                { key: 'bni', name: 'BNI' },
+                { key: 'dompet', name: 'Cash' },
+                { key: 'tunai', name: 'Cash' },
+                { key: 'cash', name: 'Cash' }
+            ];
+
+            keywords.forEach(item => {
+                if (textLower.includes(item.key)) {
+                    if (!found.includes(item.name)) found.push(item.name);
+                }
+            });
+
+            return found;
         }
 
         async function processAICommand(text) {
             const lower = text.toLowerCase();
             
+            // Cek Ringkasan / Rekap
             if (lower.includes('rekap') || lower.includes('saldo') || lower.includes('laporan') || lower.includes('total')) {
                 return await fetchAndShowSummary();
             }
 
-            if (lower.includes('transfer') || lower.includes('pindah') || lower.includes('tarik tunai') || lower.includes('setor')) {
-                return await processTransferCommand(text, lower);
+            // Ekstrak Nominal Uang
+            let amount = 0;
+            const textWithoutUnits = text.replace(/(\d+[\.,]?\d*)\s*(kg|gr|gram|ltr|liter|ml|pcs|buah|bks|bungkus|pack|porsi)/gi, '');
+            const remainingNumbers = textWithoutUnits.match(/(\d[\d\.,]*)/g);
+
+            if (remainingNumbers && remainingNumbers.length > 0) {
+                let parsedNumbers = remainingNumbers.map(n => parseFloat(n.replace(/\./g, '').replace(/,/g, '')));
+                amount = Math.max(...parsedNumbers);
             }
 
+            if (amount === 0) {
+                return "Maaf, nominal uang belum terbaca dengan jelas. Coba sertakan angka nominalnya ya.";
+            }
+
+            // Deteksi Akun
+            let accounts = detectAccounts(lower);
+            let primaryAccount = accounts.length > 0 ? accounts[0] : 'Cash';
+
+            // Cek apakah ini transfer antar 2 bank yang BERBEDA
+            let isTrueTransfer = (lower.includes('transfer') || lower.includes('pindah') || lower.includes('tarik tunai')) && accounts.length >= 2 && accounts[0] !== accounts[1];
+
+            const now = new Date();
+            const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
+
+            if (isTrueTransfer) {
+                let sourceAcc = accounts[0];
+                let destAcc = accounts[1];
+
+                const { error: err1 } = await supabaseClient.from('transaksi').insert([
+                    { tipe: 'Pengeluaran', kategori: 'Transfer Internal', akun: sourceAcc, keterangan: `Transfer ke ${destAcc}`, jumlah: amount, tanggal: localDate }
+                ]);
+                const { error: err2 } = await supabaseClient.from('transaksi').insert([
+                    { tipe: 'Pemasukan', kategori: 'Transfer Internal', akun: destAcc, keterangan: `Terima dari ${sourceAcc}`, jumlah: amount, tanggal: localDate }
+                ]);
+
+                if (err1 || err2) return `❌ Gagal memproses transfer.`;
+
+                return `🔄 <b>Transfer Berhasil (${localDate}):</b><br>
+                    • Dari: <b class="text-rose-400">${sourceAcc}</b> (-${formatIDR(amount)})<br>
+                    • Ke: <b class="text-emerald-400">${destAcc}</b> (+${formatIDR(amount)})`;
+            }
+
+            // Jika bukan transfer antar bank (bisa pengeluaran, pembayaran, infaq, atau pemasukan)
             let type = 'Pengeluaran';
             if (
                 lower.includes('masuk') || 
@@ -234,14 +288,12 @@
                 lower.includes('terima') || 
                 lower.includes('jual') || 
                 lower.includes('omset') ||
-                lower.includes('gaji') ||
-                lower.includes('saldo awal')
+                lower.includes('gaji')
             ) {
                 type = 'Pemasukan';
             }
 
-            let account = detectAccount(lower);
-
+            // Otomatis Kategori Pintar
             let category = 'Umum';
             if (lower.includes('makan') || lower.includes('beli') || lower.includes('ayam') || lower.includes('bawang') || lower.includes('sayur') || lower.includes('beras') || lower.includes('dapur') || lower.includes('minum') || lower.includes('nutrijel') || lower.includes('gula') || lower.includes('susu') || lower.includes('tahu')) {
                 category = 'Konsumsi & Dapur';
@@ -251,43 +303,24 @@
                 category = 'Pendidikan Anak';
             } else if (lower.includes('listrik') || lower.includes('air') || lower.includes('wifi') || lower.includes('pulsa') || lower.includes('token')) {
                 category = 'Utilitas & Tagihan';
-            } else if (lower.includes('infaq') || lower.includes('sedekah') || lower.includes('amal')) {
+            } else if (lower.includes('infaq') || lower.includes('sedekah') || lower.includes('amal') || lower.includes('ngasih')) {
                 category = 'Sosial & Infaq';
             } else if (type === 'Pemasukan') {
                 category = 'Inflow / Pendapatan';
             }
 
-            let amount = 0;
-            const textWithoutUnits = text.replace(/(\d+[\.,]?\d*)\s*(kg|gr|gram|ltr|liter|ml|pcs|buah|bks|bungkus|pack|porsi)/gi, '');
-            const remainingNumbers = textWithoutUnits.match(/(\d[\d\.,]*)/g);
-
-            if (remainingNumbers && remainingNumbers.length > 0) {
-                let parsedNumbers = remainingNumbers.map(n => parseFloat(n.replace(/\./g, '').replace(/,/g, '')));
-                amount = Math.max(...parsedNumbers);
-            } else {
-                const fallbackNumbers = text.match(/(\d[\d\.,]*)/g);
-                amount = fallbackNumbers ? parseFloat(fallbackNumbers[fallbackNumbers.length - 1].replace(/\./g, '').replace(/,/g, '')) : 0;
-            }
-
-            if (amount === 0) {
-                return "Maaf, nominal harga belum terdeteksi. Contoh format: <b>'beli token listrik 50000 bsi'</b>.";
-            }
-
-            // MEMBERSIHKAN KETERANGAN: Hapus kata kunci perintah, nama bank, singkatan nominal (rb, jt, K), dan angka nominalnya agar tabel bersih
+            // Bersihkan Keterangan dari Nominal & Bank
             let cleanDescription = text
-                .replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp/gi, '')
+                .replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp|transfer dari|transfer ke|transfer|pindah/gi, '')
                 .replace(/bsi|bjb|seabank|bca syariah|bca|ajaib|mandiri|bri|bni|cash|tunai|dompet/gi, '')
-                .replace(new RegExp(amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '[\\.,]?'), 'g'), '') // Hapus angka nominal
-                .replace(/\b\d+\s*(rb|ribu|jt|juta|k|K)\b/gi, '') // Hapus format seperti 50rb, 1jt, 100k
+                .replace(new RegExp(amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '[\\.,]?'), 'g'), '')
+                .replace(/\b\d+\s*(rb|ribu|jt|juta|k|K)\b/gi, '')
                 .replace(/\s+/g, ' ')
                 .trim();
 
             if (!cleanDescription || cleanDescription.length < 2) {
-                cleanDescription = text; // Fallback jika teks habis bersih
+                cleanDescription = text;
             }
-
-            const now = new Date();
-            const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
             const { error } = await supabaseClient
                 .from('transaksi')
@@ -295,7 +328,7 @@
                     { 
                         tipe: type, 
                         kategori: category,
-                        akun: account,
+                        akun: primaryAccount,
                         keterangan: cleanDescription, 
                         jumlah: amount, 
                         tanggal: localDate 
@@ -303,68 +336,17 @@
                 ]);
 
             if (error) {
-                console.error(error);
-                return `❌ Gagal menyimpan ke database Supabase: ${error.message}`;
+                return `❌ Gagal menyimpan ke database: ${error.message}`;
             }
 
-            const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
             let badgeColor = type === 'Pemasukan' ? 'text-emerald-400' : 'text-rose-400';
             
             return `✅ Tercatat Otomatis (${localDate})!<br>
                 • Tipe: <span class="${badgeColor} font-bold">${type.toUpperCase()}</span><br>
-                • Sumber Bank/Akun: <b class="text-amber-400">${account}</b><br>
+                • Sumber Akun: <b class="text-amber-400">${primaryAccount}</b><br>
                 • Kategori: <b>${category}</b><br>
                 • Jumlah: <b>${formatIDR(amount)}</b><br>
-                • Keterangan Bersih: <b>${cleanDescription}</b>`;
-        }
-
-        async function processTransferCommand(text, lower) {
-            const availableKeywords = ['bca syariah', 'bsi', 'bjb', 'seabank', 'ajaib', 'bca', 'mandiri', 'bri', 'bni', 'tunai', 'dompet', 'cash'];
-            let foundAccounts = [];
-            
-            availableKeywords.forEach(kw => {
-                if (lower.includes(kw)) {
-                    let stdName = kw;
-                    if (kw === 'tunai' || kw === 'dompet') stdName = 'Cash';
-                    else if (kw === 'bca syariah') stdName = 'BCA Syariah';
-                    else stdName = kw.toUpperCase();
-
-                    if (!foundAccounts.includes(stdName)) foundAccounts.push(stdName);
-                }
-            });
-
-            let amount = 0;
-            const numbers = text.match(/(\d[\d\.,]*)/g);
-            if (numbers) {
-                let parsed = numbers.map(n => parseFloat(n.replace(/\./g, '').replace(/,/g, '')));
-                amount = Math.max(...parsed);
-            }
-
-            if (foundAccounts.length < 2 || amount === 0) {
-                return "Format transfer kurang lengkap. Contoh: <b>'tarik tunai bjb ke cash 200000'</b> atau <b>'transfer dari seabank ke bsi 500000'</b>.";
-            }
-
-            let sourceAcc = foundAccounts[0];
-            let destAcc = foundAccounts[1];
-
-            const now = new Date();
-            const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
-            const { error: err1 } = await supabaseClient.from('transaksi').insert([
-                { tipe: 'Pengeluaran', kategori: 'Transfer Internal', akun: sourceAcc, keterangan: `Transfer ke ${destAcc}`, jumlah: amount, tanggal: localDate }
-            ]);
-            const { error: err2 } = await supabaseClient.from('transaksi').insert([
-                { tipe: 'Pemasukan', kategori: 'Transfer Internal', akun: destAcc, keterangan: `Terima dari ${sourceAcc}`, jumlah: amount, tanggal: localDate }
-            ]);
-
-            if (err1 || err2) {
-                return `❌ Gagal memproses transfer antar rekening.`;
-            }
-
-            const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
-            return `🔄 <b>Transfer Berhasil (${localDate}):</b><br>
-                • Dari Bank: <b class="text-rose-400">${sourceAcc}</b> (-${formatIDR(amount)})<br>
-                • Ke Bank: <b class="text-emerald-400">${destAcc}</b> (+${formatIDR(amount)})`;
+                • Keterangan: <b>${cleanDescription}</b>`;
         }
 
         async function fetchAndShowSummary() {
@@ -472,14 +454,12 @@
                 tbody.appendChild(tr);
             });
 
-            // Update Global Summary Cards
             let saldoBersih = totalMasuk - totalKeluar;
             document.getElementById('rep-total-masuk').innerText = formatIDR(totalMasuk);
             document.getElementById('rep-total-keluar').innerText = formatIDR(totalKeluar);
             document.getElementById('rep-net-saldo').innerText = formatIDR(saldoBersih);
             document.getElementById('rep-count').innerText = `${data.length} Transaksi`;
 
-            // Update Per-Account Summary List (Bentuk Baris Elegan)
             const accList = document.getElementById('accounts-summary-list');
             accList.innerHTML = '';
             for (const [accName, accBal] of Object.entries(accountBalances)) {
@@ -510,7 +490,7 @@
             loadingWrapper.innerHTML = `
                 <div class="bg-emerald-500 text-slate-900 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">AI</div>
                 <div class="bg-slate-800 border border-slate-700 text-slate-400 p-3.5 rounded-2xl rounded-tl-none text-xs shadow animate-pulse">
-                    Memproses dan merapikan keterangan...
+                    AI sedang menganalisis transaksi...
                 </div>
             `;
             chatContainer.appendChild(loadingWrapper);
