@@ -243,7 +243,7 @@
             let account = detectAccount(lower);
 
             let category = 'Umum';
-            if (lower.includes('makan') || lower.includes('beli') || lower.includes('ayam') || lower.includes('bawang') || lower.includes('sayur') || lower.includes('beras') || lower.includes('dapur') || lower.includes('minum')) {
+            if (lower.includes('makan') || lower.includes('beli') || lower.includes('ayam') || lower.includes('bawang') || lower.includes('sayur') || lower.includes('beras') || lower.includes('dapur') || lower.includes('minum') || lower.includes('nutrijel') || lower.includes('gula') || lower.includes('susu') || lower.includes('tahu')) {
                 category = 'Konsumsi & Dapur';
             } else if (lower.includes('bensin') || lower.includes('transport') || lower.includes('parkir') || lower.includes('gojek') || lower.includes('grab')) {
                 category = 'Transportasi';
@@ -251,6 +251,8 @@
                 category = 'Pendidikan Anak';
             } else if (lower.includes('listrik') || lower.includes('air') || lower.includes('wifi') || lower.includes('pulsa') || lower.includes('token')) {
                 category = 'Utilitas & Tagihan';
+            } else if (lower.includes('infaq') || lower.includes('sedekah') || lower.includes('amal')) {
+                category = 'Sosial & Infaq';
             } else if (type === 'Pemasukan') {
                 category = 'Inflow / Pendapatan';
             }
@@ -271,7 +273,19 @@
                 return "Maaf, nominal harga belum terdeteksi. Contoh format: <b>'beli token listrik 50000 bsi'</b>.";
             }
 
-            let cleanDescription = text.replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp|bsi|bjb|seabank|bca syariah|bca|ajaib|mandiri|bri|bni|cash|tunai|dompet/gi, '').trim();
+            // MEMBERSIHKAN KETERANGAN: Hapus kata kunci perintah, nama bank, singkatan nominal (rb, jt, K), dan angka nominalnya agar tabel bersih
+            let cleanDescription = text
+                .replace(/pemasukan|pengeluaran|masuk|keluar|rp|Rp/gi, '')
+                .replace(/bsi|bjb|seabank|bca syariah|bca|ajaib|mandiri|bri|bni|cash|tunai|dompet/gi, '')
+                .replace(new RegExp(amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '[\\.,]?'), 'g'), '') // Hapus angka nominal
+                .replace(/\b\d+\s*(rb|ribu|jt|juta|k|K)\b/gi, '') // Hapus format seperti 50rb, 1jt, 100k
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            if (!cleanDescription || cleanDescription.length < 2) {
+                cleanDescription = text; // Fallback jika teks habis bersih
+            }
+
             const now = new Date();
             const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
@@ -282,7 +296,7 @@
                         tipe: type, 
                         kategori: category,
                         akun: account,
-                        keterangan: cleanDescription || text, 
+                        keterangan: cleanDescription, 
                         jumlah: amount, 
                         tanggal: localDate 
                     }
@@ -301,7 +315,7 @@
                 • Sumber Bank/Akun: <b class="text-amber-400">${account}</b><br>
                 • Kategori: <b>${category}</b><br>
                 • Jumlah: <b>${formatIDR(amount)}</b><br>
-                • Keterangan: ${cleanDescription}`;
+                • Keterangan Bersih: <b>${cleanDescription}</b>`;
         }
 
         async function processTransferCommand(text, lower) {
@@ -496,7 +510,7 @@
             loadingWrapper.innerHTML = `
                 <div class="bg-emerald-500 text-slate-900 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">AI</div>
                 <div class="bg-slate-800 border border-slate-700 text-slate-400 p-3.5 rounded-2xl rounded-tl-none text-xs shadow animate-pulse">
-                    Memproses transaksi bank...
+                    Memproses dan merapikan keterangan...
                 </div>
             `;
             chatContainer.appendChild(loadingWrapper);
