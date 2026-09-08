@@ -325,7 +325,7 @@
             
             tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>`;
 
-            const { data, error } = await supabaseClient.from('transaksi').select('*').order('tanggal', { ascending: false });
+            const { data, error } = await supabaseClient.from('transaksi').select('*').order('id', { ascending: false });
             
             if (error) {
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-rose-400">Gagal memuat data: ${error.message}</td></tr>`;
