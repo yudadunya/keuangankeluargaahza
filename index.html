@@ -38,13 +38,18 @@
             background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
             background-size: 24px 24px;
         }
+        /* Gunakan dvh agar pas di layar HP (tidak tertutup address bar) */
+        .mobile-h-screen {
+            height: 100vh;
+            height: 100dvh;
+        }
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 4px;
+            height: 4px;
         }
         ::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
+            border-radius: 2px;
         }
     </style>
 </head>
