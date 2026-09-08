@@ -30,7 +30,7 @@
         </button>
     </header>
 
-    <!-- Main Content Area (Diberi padding bawah agar tidak tertutup navbar) -->
+    <!-- Main Content Area -->
     <main class="flex-1 overflow-hidden flex flex-col relative pb-20">
 
         <!-- VIEW 1: CHAT AI -->
@@ -41,10 +41,10 @@
                     <div class="bg-emerald-500 text-slate-900 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">AI</div>
                     <div class="bg-slate-800 border border-slate-700 p-3.5 rounded-2xl rounded-tl-none max-w-[88%] md:max-w-xl text-xs md:text-sm leading-relaxed shadow">
                         <p class="font-semibold text-emerald-400 mb-1">Halo Mind Master!</p>
-                        <p class="text-slate-300">Ketik saja apa pun secara bebas seperti ngobrol biasa. Contoh:</p>
+                        <p class="text-slate-300">Ketik apa saja secara natural tanpa format kaku. Contoh:</p>
                         <ul class="list-disc list-inside mt-1.5 space-y-1 text-slate-400">
-                            <li><i>"transfer dari bsi ke bsi UQ 1454000 untuk spp teteh"</i></li>
-                            <li><i>"ngasih ke mamah 50rb"</i></li>
+                            <li><i>"saldo di rekening bjb 503099"</i></li>
+                            <li><i>"transfer dari bsi ke bsa 150rb untuk spp teteh"</i></li>
                             <li><i>"omset nadirasa 500rb masuk bjb"</i></li>
                             <li><i>"rekap keuangan"</i></li>
                         </ul>
@@ -58,7 +58,7 @@
                     <input 
                         type="text" 
                         id="user-input" 
-                        placeholder="Ketik transaksi bebas tanpa format kaku..." 
+                        placeholder="Ketik bebas seperti ngobrol..." 
                         class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition text-xs md:text-sm"
                         autocomplete="off"
                         required
@@ -128,7 +128,7 @@
 
     </main>
 
-    <!-- Bottom Navigation Bar (Fixed di Bawah Layar HP) -->
+    <!-- Bottom Navigation Bar -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-6 py-2.5 flex justify-around items-center shadow-[0_-4px_15px_rgba(0,0,0,0.3)] z-50">
         <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center py-1 px-6 rounded-xl text-xs font-semibold transition bg-emerald-500 text-slate-900 shadow cursor-pointer">
             <i class="fa-solid fa-comments text-base"></i>
@@ -231,10 +231,13 @@
         async function processAICommand(text) {
             const lower = text.toLowerCase();
             
-            if (lower.includes('rekap') || lower.includes('saldo') || lower.includes('laporan') || lower.includes('total')) {
+            // Cek apakah murni minta rekap/laporan (tanpa menyebut angka saldo spesifik)
+            const isPureReportRequest = (lower.includes('rekap') || lower.includes('laporan keuangan') || lower.includes('total keseluruhan')) && !/\d/.test(lower);
+            if (isPureReportRequest) {
                 return await fetchAndShowSummary();
             }
 
+            // Ekstrak angka dari teks
             let amount = 0;
             const textWithoutUnits = text.replace(/(\d+[\.,]?\d*)\s*(kg|gr|gram|ltr|liter|ml|pcs|buah|bks|bungkus|pack|porsi)/gi, '');
             const remainingNumbers = textWithoutUnits.match(/(\d[\d\.,]*)/g);
@@ -244,14 +247,57 @@
                 amount = Math.max(...parsedNumbers);
             }
 
-            if (amount === 0) {
-                return "Maaf, nominal uang belum terbaca dengan jelas. Coba sertakan angka nominalnya ya.";
-            }
-
             let accounts = detectAccounts(lower);
             let primaryAccount = accounts.length > 0 ? accounts[0] : 'Cash';
-            let isTrueTransfer = (lower.includes('transfer') || lower.includes('pindah') || lower.includes('tarik tunai')) && accounts.length >= 2 && accounts[0] !== accounts[1];
 
+            // Deteksi jika user bilang "saldo di rekening bjb 503099" -> Ini artinya penyesuaian saldo (Adjustment)
+            const isBalanceAdjustment = lower.includes('saldo di rekening') || lower.includes('saldo rekening') || (lower.includes('saldo') && accounts.length > 0 && amount > 0);
+
+            if (isBalanceAdjustment && accounts.length > 0 && amount > 0) {
+                // Hitung saldo saat ini di akun tersebut via database
+                const { data: allTx } = await supabaseClient.from('transaksi').select('*');
+                let currentAccBalance = 0;
+                if (allTx) {
+                    allTx.forEach(row => {
+                        let jml = parseFloat(row.jumlah) || 0;
+                        let acc = row.akun || 'Cash';
+                        let isMasuk = (row.tipe || '').toLowerCase().includes('masuk');
+                        if (acc === primaryAccount) {
+                            if (isMasuk) currentAccBalance += jml;
+                            else currentAccBalance -= jml;
+                        }
+                    });
+                }
+
+                let selisih = amount - currentAccBalance;
+                if (selisih === 0) {
+                    return `ℹ️ Saldo rekening <b>${primaryAccount}</b> saat ini memang sudah <b>${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount)}</b>. Tidak ada perubahan yang dicatat.`;
+                }
+
+                let adjType = selisih > 0 ? 'Pemasukan' : 'Pengeluaran';
+                let adjCategory = 'Koreksi / Penyesuaian Saldo';
+                let adjAmount = Math.abs(selisih);
+
+                const now = new Date();
+                const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+                const { error } = await supabaseClient.from('transaksi').insert([
+                    { tipe: adjType, kategori: adjCategory, akun: primaryAccount, keterangan: `Koreksi Saldo ${primaryAccount} ke ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount)}`, jumlah: adjAmount, tanggal: localDate }
+                ]);
+
+                if (error) return `❌ Gagal menyesuaikan saldo: ${error.message}`;
+
+                const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
+                return `✅ <b>Saldo ${primaryAccount} Berhasil Diset! (${localDate})</b><br>
+                    • Saldo Baru: <b class="text-emerald-400">${formatIDR(amount)}</b><br>
+                    • Penyesuaian otomatis tercatat: <span class="${adjType === 'Pemasukan' ? 'text-emerald-400' : 'text-rose-400'}">${adjType} ${formatIDR(adjAmount)}</span>`;
+            }
+
+            if (amount === 0) {
+                return "Maaf, nominal uang atau maksud perintah Anda belum terbaca dengan jelas. Coba ulangi dengan bahasa yang natural ya.";
+            }
+
+            let isTrueTransfer = (lower.includes('transfer') || lower.includes('pindah') || lower.includes('tarik tunai')) && accounts.length >= 2 && accounts[0] !== accounts[1];
             const now = new Date();
             const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
             const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
@@ -275,14 +321,7 @@
             }
 
             let type = 'Pengeluaran';
-            if (
-                lower.includes('masuk') || 
-                lower.includes('pemasukan') || 
-                lower.includes('terima') || 
-                lower.includes('jual') || 
-                lower.includes('omset') ||
-                lower.includes('gaji')
-            ) {
+            if (lower.includes('masuk') || lower.includes('pemasukan') || lower.includes('terima') || lower.includes('jual') || lower.includes('omset') || lower.includes('gaji')) {
                 type = 'Pemasukan';
             }
 
@@ -326,9 +365,7 @@
                     }
                 ]);
 
-            if (error) {
-                return `❌ Gagal menyimpan ke database: ${error.message}`;
-            }
+            if (error) return `❌ Gagal menyimpan ke database: ${error.message}`;
 
             let badgeColor = type === 'Pemasukan' ? 'text-emerald-400' : 'text-rose-400';
             
